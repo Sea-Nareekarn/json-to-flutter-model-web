@@ -1,4 +1,5 @@
-export type ToolCategory = 'flutter' | 'serialization' | 'security' | 'utilities';
+export type PlatformType = 'mobile' | 'web' | 'shared';
+export type ToolCategory = 'flutter' | 'nextjs' | 'serialization' | 'security' | 'utilities';
 
 export interface ToolItem {
   id: string;
@@ -6,28 +7,31 @@ export interface ToolItem {
   title: string;
   titleTh: string;
   description: string;
+  platform: PlatformType;
   category: ToolCategory;
   badge?: string;
-  badgeColor?: 'emerald' | 'cyan' | 'indigo' | 'amber';
+  badgeColor?: 'emerald' | 'cyan' | 'indigo' | 'amber' | 'violet';
   icon: string;
   features: string[];
   popular?: boolean;
 }
 
-export const TOOL_CATEGORIES: { id: ToolCategory; name: string; nameTh: string }[] = [
-  { id: 'flutter', name: 'Flutter & Dart', nameTh: 'Flutter & Dart Tools' },
-  { id: 'serialization', name: 'JSON & Data', nameTh: 'JSON & Data Tools' },
-  { id: 'security', name: 'Security & Auth', nameTh: 'ความปลอดภัย & ถอดรหัส' },
-  { id: 'utilities', name: 'Developer Utilities', nameTh: 'เครื่องมืออำนวยความสะดวก' },
+export const PLATFORMS: { id: PlatformType | 'all'; name: string; nameTh: string; icon: string }[] = [
+  { id: 'all', name: 'All Tools', nameTh: 'เครื่องมือทั้งหมด', icon: 'Layers' },
+  { id: 'mobile', name: 'Mobile (Flutter)', nameTh: '📱 Mobile (Flutter)', icon: 'Smartphone' },
+  { id: 'web', name: 'Web (Next.js)', nameTh: '🌐 Web (Next.js & React)', icon: 'Globe' },
+  { id: 'shared', name: 'General Utilities', nameTh: '🛠️ เครื่องมือทั่วไป', icon: 'Wrench' },
 ];
 
 export const TOOLS_REGISTRY: ToolItem[] = [
+  // ==================== MOBILE (FLUTTER) TOOLS ====================
   {
     id: 'json-to-dart',
     route: '#/json-to-dart',
     title: 'JSON to Flutter Model',
     titleTh: 'แปลง JSON เป็น Flutter Model',
     description: 'แปลง JSON เป็น Dart Model คุณภาพสูง 100% SonarQube & Clean Code Certified รองรับ Pure Dart 3, Freezed, JsonSerializable และ Equatable',
+    platform: 'mobile',
     category: 'flutter',
     badge: 'SonarQube 100%',
     badgeColor: 'emerald',
@@ -46,8 +50,9 @@ export const TOOLS_REGISTRY: ToolItem[] = [
     title: 'Flutter Colors & Assets Generator',
     titleTh: 'สร้าง AppColors & AppAssets',
     description: 'แปลงรหัสสี HEX / RGB / Palette และ Asset Paths ให้เป็น Dart Class สำเร็จรูป (`AppColors`, `AppAssets`) ไร้ข้อผิดพลาดจากการพิมพ์ String ผิด',
+    platform: 'mobile',
     category: 'flutter',
-    badge: 'Clean Code',
+    badge: 'Flutter Clean Code',
     badgeColor: 'cyan',
     icon: 'Palette',
     popular: true,
@@ -59,16 +64,94 @@ export const TOOLS_REGISTRY: ToolItem[] = [
     ],
   },
   {
+    id: 'sonarqube-rules',
+    route: '#/sonarqube-rules',
+    title: 'Dart SonarQube Rules Knowledge Base',
+    titleTh: 'คลังความรู้ SonarQube Rules สำหรับ Dart',
+    description: 'สารบัญและคู่มือรวมกฎ SonarQube & Dart Analyzer ที่พบบ่อย พร้อมคำอธิบายสาเหตุ และตัวอย่างโค้ด เปรียบเทียบ Non-Compliant vs Compliant',
+    platform: 'mobile',
+    category: 'flutter',
+    badge: 'Mobile Guide',
+    badgeColor: 'emerald',
+    icon: 'ShieldCheck',
+    features: [
+      'รวมกฎ S101, S117, S1104, S1206, S1905, S3776',
+      'ตัวอย่างโค้ด Good vs Bad ชัดเจน',
+      'เทคนิคการเขียน Flutter Clean Architecture',
+      'แนวทางผ่าน Quality Gate ในองค์กร',
+    ],
+  },
+
+  // ==================== WEB (NEXT.JS) TOOLS ====================
+  {
+    id: 'json-to-typescript',
+    route: '#/json-to-typescript',
+    title: 'JSON to TypeScript & Zod Schema',
+    titleTh: 'แปลง JSON เป็น TypeScript & Zod',
+    description: 'แปลง JSON เป็น TypeScript Interface / Type และ Zod Validation Schema สำหรับ Next.js App Router, Server Actions และ API Routes',
+    platform: 'web',
+    category: 'nextjs',
+    badge: 'Next.js 15 Ready',
+    badgeColor: 'violet',
+    icon: 'Code2',
+    popular: true,
+    features: [
+      'สร้าง TypeScript Interfaces แบบ Strict Type',
+      'สร้าง Zod Schema (`z.object({...})`) อัตโนมัติ',
+      'รองรับ Nested Objects และ Array types',
+      'เหมาะสำหรับ Next.js Server Actions & API',
+    ],
+  },
+  {
+    id: 'nextjs-tailwind',
+    route: '#/nextjs-tailwind',
+    title: 'Tailwind CSS & Theme Generator',
+    titleTh: 'สร้าง Tailwind Theme & Color Tokens',
+    description: 'แปลง Color Palette เป็น config ใน `tailwind.config.ts` และ CSS Variables (`:root { --primary: ... }`) สำหรับ Next.js โปรเจกต์',
+    platform: 'web',
+    category: 'nextjs',
+    badge: 'Tailwind v3/v4',
+    badgeColor: 'cyan',
+    icon: 'Brush',
+    popular: true,
+    features: [
+      'สร้าง tailwind.config.ts theme.colors',
+      'สร้าง CSS Variables (:root theme)',
+      'รองรับ HEX, HSL, RGB palette',
+      'คัดลอกใส่ Next.js ได้ทันที',
+    ],
+  },
+  {
+    id: 'svg-to-react',
+    route: '#/svg-to-react',
+    title: 'SVG to Next.js / React JSX Component',
+    titleTh: 'แปลง SVG เป็น React/Next.js Component',
+    description: 'แปลงโค้ด SVG ดิบให้กลายเป็น React / Next.js Component (JSX/TSX) ปรับขนาด สี (currentColor) และรองรับ props SVGAttributes',
+    platform: 'web',
+    category: 'nextjs',
+    badge: 'React & TSX',
+    badgeColor: 'indigo',
+    icon: 'FileCode2',
+    features: [
+      'แปลง attributes (class->className, kebab-case->camelCase)',
+      'รองรับ TypeScript Props interface',
+      'ตั้งค่า currentColor สำหรับ dynamic icons',
+      'พร้อม Import ใช้งานใน Next.js',
+    ],
+  },
+
+  // ==================== SHARED UTILITIES ====================
+  {
     id: 'json-formatter',
     route: '#/json-formatter',
     title: 'JSON Formatter & Validator',
     titleTh: 'จัดรูปแบบ & ตรวจสอบ JSON',
     description: 'จัดระเบียบ JSON ให้สวยงาม (Beautify 2/4 spaces), ย่อไฟล์ (Minify), เรียงลำดับ Keys ตามตัวอักษร และตรวจสอบ Syntax Error แบบเรียลไทม์',
+    platform: 'shared',
     category: 'serialization',
     badge: 'Fast & Offline',
     badgeColor: 'indigo',
     icon: 'FileCode2',
-    popular: true,
     features: [
       'Beautify & Minify รวดเร็ว',
       'Alphabetical Key Sorting',
@@ -82,33 +165,16 @@ export const TOOLS_REGISTRY: ToolItem[] = [
     title: 'JWT, Base64 & URL Hub',
     titleTh: 'ถอดรหัส JWT & แปลง Base64',
     description: 'เครื่องมือถอดรหัส JSON Web Token (JWT Header, Payload, Expiration Date), แปลง Base64 Encode/Decode และ URL Encode/Decode ในที่เดียว',
+    platform: 'shared',
     category: 'security',
     badge: 'Client-Side Safe',
     badgeColor: 'amber',
     icon: 'KeyRound',
-    popular: true,
     features: [
       'ถอดรหัส JWT Payload & เช็คเวลาหมดอายุ',
       'Base64 Text/Binary Encode & Decode',
       'URL Encode & Decode ปลอดภัย',
       'ทำงานแบบ Offline 100% ปลอดภัยต่อข้อมูลความลับ',
-    ],
-  },
-  {
-    id: 'sonarqube-rules',
-    route: '#/sonarqube-rules',
-    title: 'Dart SonarQube Rules Knowledge Base',
-    titleTh: 'คลังความรู้ SonarQube Rules สำหรับ Dart',
-    description: 'สารบัญและคู่มือรวมกฎ SonarQube & Dart Analyzer ที่พบบ่อย พร้อมคำอธิบายสาเหตุ และตัวอย่างโค้ด เปรียบเทียบ Non-Compliant vs Compliant',
-    category: 'flutter',
-    badge: 'Knowledge',
-    badgeColor: 'emerald',
-    icon: 'ShieldCheck',
-    features: [
-      'รวมกฎ S101, S117, S1104, S1206, S1905, S3776',
-      'ตัวอย่างโค้ด Good vs Bad ชัดเจน',
-      'เทคนิคการเขียน Flutter Clean Architecture',
-      'แนวทางผ่าน Quality Gate ในองค์กร',
     ],
   },
 ];

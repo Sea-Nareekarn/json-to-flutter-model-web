@@ -6,6 +6,9 @@ import { JsonFormatterTool } from './components/tools/JsonFormatterTool';
 import { FlutterAssetsTool } from './components/tools/FlutterAssetsTool';
 import { JwtEncoderTool } from './components/tools/JwtEncoderTool';
 import { SonarRulesExplorerTool } from './components/tools/SonarRulesExplorerTool';
+import { JsonToTypescriptTool } from './components/tools/JsonToTypescriptTool';
+import { NextjsTailwindTool } from './components/tools/NextjsTailwindTool';
+import { SvgToReactTool } from './components/tools/SvgToReactTool';
 
 export const App: React.FC = () => {
   const getToolFromHash = (): string | null => {
@@ -38,16 +41,28 @@ export const App: React.FC = () => {
 
   const renderCurrentView = () => {
     switch (currentToolId) {
+      // Mobile (Flutter)
       case 'json-to-dart':
         return <JsonToDartTool />;
       case 'flutter-assets':
         return <FlutterAssetsTool />;
+      case 'sonarqube-rules':
+        return <SonarRulesExplorerTool />;
+
+      // Web (Next.js)
+      case 'json-to-typescript':
+        return <JsonToTypescriptTool />;
+      case 'nextjs-tailwind':
+        return <NextjsTailwindTool />;
+      case 'svg-to-react':
+        return <SvgToReactTool />;
+
+      // Shared Utilities
       case 'json-formatter':
         return <JsonFormatterTool />;
       case 'jwt-decoder':
         return <JwtEncoderTool />;
-      case 'sonarqube-rules':
-        return <SonarRulesExplorerTool />;
+
       default:
         return <HomeDashboard onSelectTool={handleSelectTool} />;
     }
@@ -69,13 +84,14 @@ export const App: React.FC = () => {
 
       {/* Footer */}
       <footer className="border-t border-slate-800/80 bg-slate-950/80 py-6 px-4 text-center text-xs text-slate-500 mt-12">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-400">DevTools Hub</span>
+            <span className="font-bold text-slate-300">DevTools Hub</span>
             <span>•</span>
-            <span>SonarQube &amp; Clean Code Ready</span>
+            <span>Mobile (Flutter) &amp; Web (Next.js)</span>
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
+
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-slate-400">
             <button
               onClick={handleNavigateHome}
               className="hover:text-cyan-300 transition-colors"
@@ -87,26 +103,26 @@ export const App: React.FC = () => {
               onClick={() => handleSelectTool('json-to-dart')}
               className="hover:text-cyan-300 transition-colors"
             >
-              JSON to Dart Model
+              JSON to Flutter
             </button>
             <span>•</span>
             <button
-              onClick={() => handleSelectTool('flutter-assets')}
-              className="hover:text-cyan-300 transition-colors"
+              onClick={() => handleSelectTool('json-to-typescript')}
+              className="hover:text-violet-300 transition-colors"
             >
-              Colors &amp; Assets
+              JSON to Next.js / Zod
             </button>
             <span>•</span>
             <button
-              onClick={() => handleSelectTool('json-formatter')}
-              className="hover:text-cyan-300 transition-colors"
+              onClick={() => handleSelectTool('nextjs-tailwind')}
+              className="hover:text-violet-300 transition-colors"
             >
-              JSON Formatter
+              Next.js Tailwind
             </button>
             <span>•</span>
             <button
               onClick={() => handleSelectTool('jwt-decoder')}
-              className="hover:text-cyan-300 transition-colors"
+              className="hover:text-amber-300 transition-colors"
             >
               JWT Decoder
             </button>
