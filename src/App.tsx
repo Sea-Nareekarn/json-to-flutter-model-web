@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { Navbar } from './components/Navbar';
 import { HomeDashboard } from './components/HomeDashboard';
+import { SonarCodeLinterTool } from './components/tools/SonarCodeLinterTool';
 import { JsonToDartTool } from './components/tools/JsonToDartTool';
 import { JsonFormatterTool } from './components/tools/JsonFormatterTool';
 import { FlutterAssetsTool } from './components/tools/FlutterAssetsTool';
@@ -45,6 +46,8 @@ export const App: React.FC = () => {
   const renderCurrentView = () => {
     switch (currentToolId) {
       // Mobile (Flutter)
+      case 'sonar-linter':
+        return <SonarCodeLinterTool />;
       case 'json-to-dart':
         return <JsonToDartTool />;
       case 'flutter-assets':
@@ -93,7 +96,7 @@ export const App: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-700 dark:text-slate-300">DevTools Hub</span>
             <span>•</span>
-            <span>Mobile (Flutter) &amp; Web (Next.js)</span>
+            <span>SonarQube Linter &amp; Code Inspector</span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-slate-600 dark:text-slate-400">
@@ -102,6 +105,13 @@ export const App: React.FC = () => {
               className="hover:text-cyan-600 dark:hover:text-cyan-300 transition-colors"
             >
               หน้าแรก
+            </button>
+            <span>•</span>
+            <button
+              onClick={() => handleSelectTool('sonar-linter')}
+              className="hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors font-semibold"
+            >
+              SonarQube Linter
             </button>
             <span>•</span>
             <button
@@ -116,13 +126,6 @@ export const App: React.FC = () => {
               className="hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
             >
               JSON to Next.js / Zod
-            </button>
-            <span>•</span>
-            <button
-              onClick={() => handleSelectTool('nextjs-tailwind')}
-              className="hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
-            >
-              Next.js Tailwind
             </button>
             <span>•</span>
             <button

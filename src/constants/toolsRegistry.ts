@@ -26,6 +26,25 @@ export const PLATFORMS: { id: PlatformType | 'all'; name: string; nameTh: string
 export const TOOLS_REGISTRY: ToolItem[] = [
   // ==================== MOBILE (FLUTTER) TOOLS ====================
   {
+    id: 'sonar-linter',
+    route: '#/sonar-linter',
+    title: 'SonarQube Code Checker & Linter',
+    titleTh: 'เช็คโค้ด & แสดง SonarQube Issues รายบรรทัด',
+    description: 'วางโค้ด Dart / Flutter เพื่อตรวจจับและวิเคราะห์ Code Smells, Bugs และ Warnings ของ SonarQube แบบรายบรรทัด พร้อมคำแนะนำวิธีแก้และ Auto-Fix',
+    platform: 'mobile',
+    category: 'flutter',
+    badge: 'Line-by-Line Inspector',
+    badgeColor: 'emerald',
+    icon: 'ShieldCheck',
+    popular: true,
+    features: [
+      'ตรวจจับ Issues แบบรายบรรทัด (Line-by-Line Gutter)',
+      'ครอบคลุมกฎ S101, S117, S1104, S1206, S1905, S1186',
+      'Quality Gate Score คำนวณความสอดคล้องแบบ Real-time',
+      'ปุ่ม Auto-Fix ช่วยแก้ไขโค้ดที่ผิดให้อัตโนมัติในคลิกเดียว',
+    ],
+  },
+  {
     id: 'json-to-dart',
     route: '#/json-to-dart',
     title: 'JSON to Flutter Model',
