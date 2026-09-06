@@ -27,8 +27,9 @@ export default {
         }
       },
       fontFamily: {
-        mono: ['Fira Code', 'JetBrains Mono', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', '"IBM Plex Sans Thai"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        thai: ['"IBM Plex Sans Thai"', '"Plus Jakarta Sans"', 'sans-serif'],
+        mono: ['"JetBrains Mono"', '"Fira Code"', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       }
     },
   },
