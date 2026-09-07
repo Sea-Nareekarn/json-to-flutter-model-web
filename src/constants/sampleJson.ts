@@ -9,18 +9,19 @@ export interface SamplePreset {
 
 export const SAMPLE_PRESETS: SamplePreset[] = [
   {
-    id: 'crop_fill_check',
-    name: 'Crop Fill Check Detail',
-    nameTh: 'ตัวอย่าง Crop Fill Error (Nested List & Flags)',
-    description: 'มี nested List<DetailErrorList>, boolean flags, และ top-level helper functions',
-    defaultClassName: 'CropFillCheckDetailErrorModel',
+    id: 'device_diagnostics',
+    name: 'Device Diagnostics & Inspection',
+    nameTh: 'รายงานผลการตรวจเช็กอุปกรณ์ (Nested List & Flags)',
+    description: 'มี nested List<InspectionItem>, boolean flags, และ status fields',
+    defaultClassName: 'DeviceDiagnosticsResponse',
     json: JSON.stringify({
-      amountZero: false,
-      detailErrorList: [
+      hasError: false,
+      inspectionCount: 12,
+      inspectionList: [
         {
-          randomAmountZero: true,
-          randomAmountOver: false,
-          notFoundAmountOver: false
+          isPassed: true,
+          sensorErrorCount: 0,
+          hardwareWarning: false
         }
       ]
     }, null, 2),
