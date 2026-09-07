@@ -124,7 +124,17 @@ export const OptionsBar: React.FC<OptionsBarProps> = ({
                     onChange={(e) => onChangeOptions({ generateCopyWith: e.target.checked })}
                     className="rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-cyan-600 dark:text-cyan-500 focus:ring-0"
                   />
-                  <span>copyWith</span>
+                  <span title="Generate .copyWith() method for updating immutable models">copyWith</span>
+                </label>
+
+                <label className="flex items-center gap-1.5 cursor-pointer hover:text-slate-900 dark:hover:text-white transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={options.generateToString}
+                    onChange={(e) => onChangeOptions({ generateToString: e.target.checked })}
+                    className="rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-cyan-600 dark:text-cyan-500 focus:ring-0"
+                  />
+                  <span title="Generate toString() method for debug logs">toString()</span>
                 </label>
 
                 <label className="flex items-center gap-1.5 cursor-pointer hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -134,7 +144,7 @@ export const OptionsBar: React.FC<OptionsBarProps> = ({
                     onChange={(e) => onChangeOptions({ generateEquality: e.target.checked })}
                     className="rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-cyan-600 dark:text-cyan-500 focus:ring-0"
                   />
-                  <span>== &amp; hashCode</span>
+                  <span title="Generate operator == and hashCode">== &amp; hashCode</span>
                 </label>
 
                 <label className="flex items-center gap-1.5 cursor-pointer hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -144,7 +154,7 @@ export const OptionsBar: React.FC<OptionsBarProps> = ({
                     onChange={(e) => onChangeOptions({ useImmutableAnnotation: e.target.checked })}
                     className="rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-cyan-600 dark:text-cyan-500 focus:ring-0"
                   />
-                  <span>@immutable</span>
+                  <span title="Import meta.dart and add @immutable annotation">@immutable</span>
                 </label>
               </>
             )}
@@ -156,17 +166,7 @@ export const OptionsBar: React.FC<OptionsBarProps> = ({
                 onChange={(e) => onChangeOptions({ generateToJson: e.target.checked })}
                 className="rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-cyan-600 dark:text-cyan-500 focus:ring-0"
               />
-              <span>toJson()</span>
-            </label>
-
-            <label className="flex items-center gap-1.5 cursor-pointer hover:text-slate-900 dark:hover:text-white transition-colors">
-              <input
-                type="checkbox"
-                checked={options.generateComments}
-                onChange={(e) => onChangeOptions({ generateComments: e.target.checked })}
-                className="rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-cyan-600 dark:text-cyan-500 focus:ring-0"
-              />
-              <span>Sonar Header Comments</span>
+              <span title="Generate Map<String, dynamic> toJson() method">toJson()</span>
             </label>
           </div>
         </div>
