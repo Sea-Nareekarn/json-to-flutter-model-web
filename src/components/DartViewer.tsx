@@ -98,13 +98,13 @@ export const DartViewer: React.FC<DartViewerProps> = ({
       {/* Viewer Header Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 gap-2">
         {/* Class Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 max-w-full">
+        <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 min-w-0 flex-1 no-scrollbar">
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-3 py-1 rounded-md text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`h-8 px-3 rounded-lg text-xs font-semibold whitespace-nowrap flex-shrink-0 transition-all inline-flex items-center ${
               activeTab === 'all'
                 ? 'bg-cyan-100 dark:bg-cyan-600/30 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/50 shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/80'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/80 border border-transparent'
             }`}
           >
             All Classes ({classes.length})
@@ -115,10 +115,10 @@ export const DartViewer: React.FC<DartViewerProps> = ({
               <button
                 key={c.className}
                 onClick={() => setActiveTab(c.className)}
-                className={`px-2.5 py-1 rounded-md text-xs font-mono whitespace-nowrap transition-all ${
+                className={`h-8 px-2.5 rounded-lg text-xs font-mono whitespace-nowrap flex-shrink-0 transition-all inline-flex items-center ${
                   activeTab === c.className
                     ? 'bg-cyan-100 dark:bg-cyan-600/30 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/50 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/80'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/80 border border-transparent'
                 }`}
               >
                 {c.className}
@@ -127,21 +127,21 @@ export const DartViewer: React.FC<DartViewerProps> = ({
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-1.5 self-end sm:self-auto">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           {/* SonarQube score badge */}
           <button
             onClick={onOpenSonarModal}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
-            title="View SonarQube Compliance Audit"
+            className="h-8 px-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-all inline-flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 shadow-sm"
+            title="คลิกเพื่อดูรายละเอียด SonarQube Compliance Audit"
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
             <span>Sonar: {complianceScore}%</span>
           </button>
 
           {/* Copy Button */}
           <button
             onClick={() => handleCopy(displayedCode)}
-            className="flex items-center gap-1 px-3 py-1 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-md shadow-cyan-600/20 transition-all active:scale-95"
+            className="h-8 px-3 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 inline-flex items-center gap-1.5 whitespace-nowrap flex-shrink-0"
             title="Copy Dart Code"
           >
             {copied ? (
@@ -160,7 +160,7 @@ export const DartViewer: React.FC<DartViewerProps> = ({
           {/* Download Single File */}
           <button
             onClick={() => handleDownloadSingle(displayedFileName, displayedCode)}
-            className="p-1.5 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors border border-slate-300 dark:border-slate-700/60"
+            className="h-8 w-8 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors border border-slate-300 dark:border-slate-700/60 inline-flex items-center justify-center flex-shrink-0 shadow-sm"
             title={`Download ${displayedFileName}`}
           >
             <Download className="w-3.5 h-3.5" />
@@ -170,7 +170,7 @@ export const DartViewer: React.FC<DartViewerProps> = ({
           {files.length > 1 && (
             <button
               onClick={() => handleDownloadZip(files)}
-              className="p-1.5 rounded-md text-indigo-600 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-white hover:bg-indigo-50 dark:hover:bg-indigo-950 border border-indigo-200 dark:border-indigo-500/30 transition-colors"
+              className="h-8 w-8 rounded-lg text-indigo-600 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-white hover:bg-indigo-50 dark:hover:bg-indigo-950 border border-indigo-200 dark:border-indigo-500/30 transition-colors inline-flex items-center justify-center flex-shrink-0 shadow-sm"
               title="Download All Classes as .ZIP"
             >
               <FileArchive className="w-3.5 h-3.5" />
