@@ -65,6 +65,7 @@ export class JsonToAstParser {
         // Empty array
         const rootClass: ParsedClass = {
           className: rootName,
+          isRootArray: true,
           properties: [
             {
               jsonKey: 'items',
@@ -88,12 +89,14 @@ export class JsonToAstParser {
       const firstElem = jsonInput[0];
       if (firstElem && typeof firstElem === 'object' && !Array.isArray(firstElem)) {
         const mergedObj = mergeObjectArray(jsonInput);
-        this.parseObject(rootName, mergedObj);
+        const rootClass = this.parseObject(rootName, mergedObj);
+        rootClass.isRootArray = true;
       } else {
         // Primitive list root
         const elemType = this.inferPrimitiveType(firstElem);
         const rootClass: ParsedClass = {
           className: rootName,
+          isRootArray: true,
           properties: [
             {
               jsonKey: 'data',

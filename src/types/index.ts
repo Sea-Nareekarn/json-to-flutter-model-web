@@ -37,6 +37,7 @@ export interface ParsedClass {
   className: string;
   properties: ParsedProperty[];
   originalSample?: Record<string, unknown>;
+  isRootArray?: boolean;
 }
 
 export interface GeneratedFile {

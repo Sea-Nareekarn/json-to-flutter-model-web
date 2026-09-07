@@ -9,6 +9,31 @@ export interface SamplePreset {
 
 export const SAMPLE_PRESETS: SamplePreset[] = [
   {
+    id: 'root_array_list',
+    name: 'Root Array List [ ... ]',
+    nameTh: 'API Response แบบ Array นอกสุด [ ... ]',
+    description: 'ทดสอบ JSON ที่ครอบด้วย Array [] นอกสุด พร้อม List<TaskItem> fromJson / toJson',
+    defaultClassName: 'TaskItem',
+    json: JSON.stringify([
+      {
+        id: 1,
+        title: "Flutter Clean Architecture Review",
+        status: "APPROVED",
+        score: 98.5,
+        is_completed: true,
+        tags: ["mobile", "architecture", "flutter"]
+      },
+      {
+        id: 2,
+        title: "SonarQube Quality Gate Inspection",
+        status: "IN_PROGRESS",
+        score: 100.0,
+        is_completed: false,
+        tags: ["clean_code", "security"]
+      }
+    ], null, 2),
+  },
+  {
     id: 'device_diagnostics',
     name: 'Device Diagnostics & Inspection',
     nameTh: 'รายงานผลการตรวจเช็กอุปกรณ์ (Nested List & Flags)',

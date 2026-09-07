@@ -9,6 +9,7 @@ export class PureDartGenerator {
 
     const lines: string[] = [];
     const rootClass = parsedClasses[0];
+    const isRootArray = !!rootClass.isRootArray;
     const rootVarName = toCamelCase(rootClass.className);
 
     // 1. Top-Level Documentation & Helper Comments
@@ -23,14 +24,25 @@ export class PureDartGenerator {
     lines.push('');
 
     // 2. Top-Level Helper Functions
-    lines.push(`${rootClass.className} ${rootVarName}FromJson(`);
-    lines.push('        final String str,) =>');
-    lines.push(`    ${rootClass.className}.fromJson(json.decode(str));`);
-    lines.push('');
-    lines.push(`String ${rootVarName}ToJson(`);
-    lines.push(`        final ${rootClass.className} data,) =>`);
-    lines.push('    json.encode(data.toJson());');
-    lines.push('');
+    if (isRootArray) {
+      lines.push(`List<${rootClass.className}> ${rootVarName}FromJson(`);
+      lines.push('        final String str,) =>');
+      lines.push(`    List<${rootClass.className}>.from((json.decode(str) as List<dynamic>).map((final dynamic x) => ${rootClass.className}.fromJson(x as Map<String, dynamic>)));`);
+      lines.push('');
+      lines.push(`String ${rootVarName}ToJson(`);
+      lines.push(`        final List<${rootClass.className}> data,) =>`);
+      lines.push(`    json.encode(List<dynamic>.from(data.map((final ${rootClass.className} x) => x.toJson())));`);
+      lines.push('');
+    } else {
+      lines.push(`${rootClass.className} ${rootVarName}FromJson(`);
+      lines.push('        final String str,) =>');
+      lines.push(`    ${rootClass.className}.fromJson(json.decode(str) as Map<String, dynamic>);`);
+      lines.push('');
+      lines.push(`String ${rootVarName}ToJson(`);
+      lines.push(`        final ${rootClass.className} data,) =>`);
+      lines.push('    json.encode(data.toJson());');
+      lines.push('');
+    }
 
     // 3. Class Definitions
     for (let i = 0; i < parsedClasses.length; i++) {
