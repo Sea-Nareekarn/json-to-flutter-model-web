@@ -1,31 +1,38 @@
 import { GeneratorOptions, ParsedClass, ParsedProperty } from '../types';
+import { toCamelCase } from './naming';
 
 export class PureDartGenerator {
   constructor(private options: GeneratorOptions) {}
 
   public generate(parsedClasses: ParsedClass[]): string {
+    if (parsedClasses.length === 0) return '';
+
     const lines: string[] = [];
+    const rootClass = parsedClasses[0];
+    const rootVarName = toCamelCase(rootClass.className);
 
-    // Header comment with SonarQube compliance certification
-    if (this.options.generateComments) {
-      lines.push('// ==============================================================================');
-      lines.push('// GENERATED CODE - 100% SONARQUBE & DART ANALYZER COMPLIANT');
-      lines.push('// Rules Enforced:');
-      lines.push('//  - dart:S101  (camel_case_types)');
-      lines.push('//  - dart:S117  (non_constant_identifier_names)');
-      lines.push('//  - dart:S1104 (prefer_const_constructors)');
-      lines.push('//  - dart:S1206 (hash_and_equals paired override)');
-      lines.push('//  - dart:S1905 (safe type casting without runtime exceptions)');
-      lines.push('//  - dart:S3776 (low cognitive complexity)');
-      lines.push('// ==============================================================================');
-      lines.push('');
-    }
-
+    // 1. Top-Level Documentation & Helper Comments
+    lines.push('// To parse this JSON data, do');
+    lines.push('//');
+    lines.push(`//     final ${rootVarName} = ${rootVarName}FromJson(jsonString);`);
+    lines.push('');
+    lines.push("import 'dart:convert';");
     if (this.options.useImmutableAnnotation) {
       lines.push("import 'package:meta/meta.dart';");
-      lines.push('');
     }
+    lines.push('');
 
+    // 2. Top-Level Helper Functions
+    lines.push(`${rootClass.className} ${rootVarName}FromJson(`);
+    lines.push('        final String str,) =>');
+    lines.push(`    ${rootClass.className}.fromJson(json.decode(str));`);
+    lines.push('');
+    lines.push(`String ${rootVarName}ToJson(`);
+    lines.push(`        final ${rootClass.className} data,) =>`);
+    lines.push('    json.encode(data.toJson());');
+    lines.push('');
+
+    // 3. Class Definitions
     for (let i = 0; i < parsedClasses.length; i++) {
       const cls = parsedClasses[i];
       lines.push(this.generateClass(cls));
@@ -39,10 +46,11 @@ export class PureDartGenerator {
 
   public generateSingleClass(cls: ParsedClass): string {
     const lines: string[] = [];
+    lines.push("import 'dart:convert';");
     if (this.options.useImmutableAnnotation) {
       lines.push("import 'package:meta/meta.dart';");
-      lines.push('');
     }
+    lines.push('');
     lines.push(this.generateClass(cls));
     return lines.join('\n');
   }
@@ -56,43 +64,39 @@ export class PureDartGenerator {
 
     lines.push(`class ${cls.className} {`);
 
-    // 1. Fields
+    // 1. Constructor (at top of class)
+    lines.push(this.generateConstructor(cls));
+
+    // 2. Factory fromJson
+    lines.push('');
+    lines.push(this.generateFromJson(cls));
+
+    // 3. Field Declarations (after fromJson)
     for (const prop of cls.properties) {
       const typeStr = this.getTypeString(prop);
       lines.push(`  final ${typeStr} ${prop.dartFieldName};`);
     }
 
-    if (cls.properties.length > 0) {
+    // 4. copyWith
+    if (this.options.generateCopyWith && cls.properties.length > 0) {
       lines.push('');
+      lines.push(this.generateCopyWith(cls));
     }
 
-    // 2. Const Constructor
-    lines.push(this.generateConstructor(cls));
-
-    // 3. fromJson factory
-    lines.push('');
-    lines.push(this.generateFromJson(cls));
-
-    // 4. toJson method
+    // 5. toJson
     if (this.options.generateToJson) {
       lines.push('');
       lines.push(this.generateToJson(cls));
     }
 
-    // 5. copyWith method
-    if (this.options.generateCopyWith) {
-      lines.push('');
-      lines.push(this.generateCopyWith(cls));
-    }
-
-    // 6. toString method
-    if (this.options.generateToString) {
+    // 6. toString
+    if (this.options.generateToString && cls.properties.length > 0) {
       lines.push('');
       lines.push(this.generateToString(cls));
     }
 
     // 7. operator == & hashCode
-    if (this.options.generateEquality) {
+    if (this.options.generateEquality && cls.properties.length > 0) {
       lines.push('');
       lines.push(this.generateEquality(cls));
       lines.push('');
@@ -107,7 +111,7 @@ export class PureDartGenerator {
     if (prop.dartType === 'dynamic') {
       return 'dynamic';
     }
-    if (prop.isNullable) {
+    if (prop.isNullable || this.options.nullability !== 'non_nullable') {
       return `${prop.dartType}?`;
     }
     return prop.dartType;
@@ -115,17 +119,17 @@ export class PureDartGenerator {
 
   private generateConstructor(cls: ParsedClass): string {
     if (cls.properties.length === 0) {
-      return `  const ${cls.className}();`;
+      return `  ${cls.className}();`;
     }
 
     const lines: string[] = [];
-    lines.push(`  const ${cls.className}({`);
+    lines.push(`  ${cls.className}({`);
 
     for (const prop of cls.properties) {
-      if (prop.isNullable || prop.dartType === 'dynamic') {
-        lines.push(`    this.${prop.dartFieldName},`);
-      } else {
+      if (this.options.nullability === 'non_nullable' && !prop.isNullable) {
         lines.push(`    required this.${prop.dartFieldName},`);
+      } else {
+        lines.push(`    this.${prop.dartFieldName},`);
       }
     }
 
@@ -135,142 +139,97 @@ export class PureDartGenerator {
 
   private generateFromJson(cls: ParsedClass): string {
     const lines: string[] = [];
-    lines.push(`  factory ${cls.className}.fromJson(Map<String, dynamic> json) {`);
-    lines.push(`    return ${cls.className}(`);
+    lines.push('  factory ' + cls.className + '.fromJson(');
+    lines.push('    final Map<String, dynamic> json,');
+    lines.push('  ) =>');
+    lines.push(`      ${cls.className}(`);
 
     for (const prop of cls.properties) {
       const parseExpr = this.generateFieldParser(prop);
-      lines.push(`      ${prop.dartFieldName}: ${parseExpr},`);
+      lines.push(`        ${prop.dartFieldName}: ${parseExpr},`);
     }
 
-    lines.push('    );');
-    lines.push('  }');
+    lines.push('      );');
     return lines.join('\n');
   }
 
   private generateFieldParser(prop: ParsedProperty): string {
     const key = `'${prop.jsonKey}'`;
-    const isNullable = prop.isNullable;
 
     if (prop.dartType === 'dynamic') {
       return `json[${key}]`;
     }
 
+    if (prop.dartType === 'bool') {
+      return `json[${key}]`;
+    }
+
     if (prop.dartType === 'String') {
-      return isNullable
-        ? `json[${key}]?.toString()`
-        : `json[${key}]?.toString() ?? ''`;
+      return `json[${key}]`;
     }
 
     if (prop.dartType === 'int') {
-      if (this.options.safeNumberParsing) {
-        return isNullable
-          ? `(json[${key}] as num?)?.toInt()`
-          : `(json[${key}] as num?)?.toInt() ?? 0`;
-      }
-      return isNullable
-        ? `json[${key}] as int?`
-        : `json[${key}] as int? ?? 0`;
+      return `json[${key}]`;
     }
 
     if (prop.dartType === 'double') {
       if (this.options.safeNumberParsing) {
-        return isNullable
-          ? `(json[${key}] as num?)?.toDouble()`
-          : `(json[${key}] as num?)?.toDouble() ?? 0.0`;
+        return `json[${key}] == null ? null : (json[${key}] as num).toDouble()`;
       }
-      return isNullable
-        ? `(json[${key}] as num?)?.toDouble()`
-        : `(json[${key}] as num?)?.toDouble() ?? 0.0`;
-    }
-
-    if (prop.dartType === 'bool') {
-      return isNullable
-        ? `json[${key}] as bool?`
-        : `json[${key}] as bool? ?? false`;
+      return `json[${key}]?.toDouble()`;
     }
 
     if (prop.isDateTime) {
-      return isNullable
-        ? `json[${key}] != null ? DateTime.tryParse(json[${key}].toString()) : null`
-        : `json[${key}] != null ? DateTime.tryParse(json[${key}].toString()) ?? DateTime.now() : DateTime.now()`;
+      return `json[${key}] == null ? null : DateTime.tryParse(json[${key}].toString())`;
     }
 
     if (prop.isObject && prop.nestedClassName) {
       const clsName = prop.nestedClassName;
-      return isNullable
-        ? `json[${key}] != null ? ${clsName}.fromJson(json[${key}] as Map<String, dynamic>) : null`
-        : `${clsName}.fromJson(json[${key}] as Map<String, dynamic>)`;
+      return `json[${key}] == null ? null : ${clsName}.fromJson(json[${key}] as Map<String, dynamic>)`;
     }
 
     if (prop.isList) {
       if (prop.isObjectList && prop.listElementType) {
         const elemCls = prop.listElementType;
-        if (isNullable) {
-          return `(json[${key}] as List<dynamic>?)` +
-            `?.map((e) => ${elemCls}.fromJson(e as Map<String, dynamic>))` +
-            `.toList()`;
-        }
-        return `(json[${key}] as List<dynamic>?)` +
-          `?.map((e) => ${elemCls}.fromJson(e as Map<String, dynamic>))` +
-          `.toList() ?? const []`;
+        return `json[${key}] == null\n` +
+          `            ? <${elemCls}>[]\n` +
+          `            : List<${elemCls}>.from(\n` +
+          `                (json[${key}] as List<dynamic>)\n` +
+          `                    .cast<Map<String, dynamic>>()\n` +
+          `                    .map(${elemCls}.fromJson),\n` +
+          `              )`;
       }
 
       if (prop.listElementType === 'String') {
-        return isNullable
-          ? `(json[${key}] as List<dynamic>?)?.map((e) => e.toString()).toList()`
-          : `(json[${key}] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const []`;
+        return `json[${key}] == null\n` +
+          `            ? <String>[]\n` +
+          `            : List<String>.from((json[${key}] as List<dynamic>).map((final dynamic x) => x.toString()))`;
       }
 
       if (prop.listElementType === 'int') {
-        return isNullable
-          ? `(json[${key}] as List<dynamic>?)?.map((e) => (e as num).toInt()).toList()`
-          : `(json[${key}] as List<dynamic>?)?.map((e) => (e as num).toInt()).toList() ?? const []`;
+        return `json[${key}] == null\n` +
+          `            ? <int>[]\n` +
+          `            : List<int>.from((json[${key}] as List<dynamic>).map((final dynamic x) => (x as num).toInt()))`;
       }
 
       if (prop.listElementType === 'double') {
-        return isNullable
-          ? `(json[${key}] as List<dynamic>?)?.map((e) => (e as num).toDouble()).toList()`
-          : `(json[${key}] as List<dynamic>?)?.map((e) => (e as num).toDouble()).toList() ?? const []`;
+        return `json[${key}] == null\n` +
+          `            ? <double>[]\n` +
+          `            : List<double>.from((json[${key}] as List<dynamic>).map((final dynamic x) => (x as num).toDouble()))`;
       }
 
       if (prop.listElementType === 'bool') {
-        return isNullable
-          ? `(json[${key}] as List<dynamic>?)?.map((e) => e as bool).toList()`
-          : `(json[${key}] as List<dynamic>?)?.map((e) => e as bool).toList() ?? const []`;
+        return `json[${key}] == null\n` +
+          `            ? <bool>[]\n` +
+          `            : List<bool>.from((json[${key}] as List<dynamic>).map((final dynamic x) => x as bool))`;
       }
 
-      return isNullable
-        ? `json[${key}] as List<dynamic>?`
-        : `json[${key}] as List<dynamic>? ?? const []`;
+      return `json[${key}] == null\n` +
+        `            ? <dynamic>[]\n` +
+        `            : List<dynamic>.from((json[${key}] as List<dynamic>).map((final dynamic x) => x))`;
     }
 
     return `json[${key}]`;
-  }
-
-  private generateToJson(cls: ParsedClass): string {
-    const lines: string[] = [];
-    lines.push('  Map<String, dynamic> toJson() {');
-    lines.push('    return {');
-
-    for (const prop of cls.properties) {
-      const key = `'${prop.jsonKey}'`;
-      const field = prop.dartFieldName;
-
-      if (prop.isDateTime) {
-        lines.push(`      ${key}: ${field}${prop.isNullable ? '?' : ''}.toIso8601String(),`);
-      } else if (prop.isObject) {
-        lines.push(`      ${key}: ${field}${prop.isNullable ? '?' : ''}.toJson(),`);
-      } else if (prop.isList && prop.isObjectList) {
-        lines.push(`      ${key}: ${field}${prop.isNullable ? '?' : ''}.map((e) => e.toJson()).toList(),`);
-      } else {
-        lines.push(`      ${key}: ${field},`);
-      }
-    }
-
-    lines.push('    };');
-    lines.push('  }');
-    return lines.join('\n');
   }
 
   private generateCopyWith(cls: ParsedClass): string {
@@ -278,19 +237,48 @@ export class PureDartGenerator {
     lines.push(`  ${cls.className} copyWith({`);
 
     for (const prop of cls.properties) {
-      const typeStr = prop.dartType === 'dynamic' ? 'dynamic' : `${prop.dartType}?`;
-      lines.push(`    ${typeStr} ${prop.dartFieldName},`);
+      const typeStr = this.getTypeString(prop);
+      lines.push(`    final ${typeStr} ${prop.dartFieldName},`);
     }
 
-    lines.push('  }) {');
-    lines.push(`    return ${cls.className}(`);
+    lines.push('  }) =>');
+    lines.push(`      ${cls.className}(`);
 
     for (const prop of cls.properties) {
-      lines.push(`      ${prop.dartFieldName}: ${prop.dartFieldName} ?? this.${prop.dartFieldName},`);
+      lines.push(`        ${prop.dartFieldName}: ${prop.dartFieldName} ?? this.${prop.dartFieldName},`);
     }
 
-    lines.push('    );');
-    lines.push('  }');
+    lines.push('      );');
+    return lines.join('\n');
+  }
+
+  private generateToJson(cls: ParsedClass): string {
+    const lines: string[] = [];
+    lines.push('  Map<String, dynamic> toJson() => <String, dynamic>{');
+
+    for (const prop of cls.properties) {
+      const key = `'${prop.jsonKey}'`;
+      const field = prop.dartFieldName;
+
+      if (prop.isDateTime) {
+        lines.push(`        ${key}: ${field}?.toIso8601String(),`);
+      } else if (prop.isObject && prop.nestedClassName) {
+        lines.push(`        ${key}: ${field}?.toJson(),`);
+      } else if (prop.isList && prop.isObjectList && prop.listElementType) {
+        const elemCls = prop.listElementType;
+        lines.push(`        ${key}: ${field} == null`);
+        lines.push('            ? <dynamic>[]');
+        lines.push(`            : List<dynamic>.from(${field}!.map((final ${elemCls} x) => x.toJson())),`);
+      } else if (prop.isList) {
+        lines.push(`        ${key}: ${field} == null`);
+        lines.push('            ? <dynamic>[]');
+        lines.push(`            : List<dynamic>.from(${field}!.map((final dynamic x) => x)),`);
+      } else {
+        lines.push(`        ${key}: ${field},`);
+      }
+    }
+
+    lines.push('      };');
     return lines.join('\n');
   }
 
@@ -306,7 +294,7 @@ export class PureDartGenerator {
   private generateEquality(cls: ParsedClass): string {
     const lines: string[] = [];
     lines.push('  @override');
-    lines.push('  bool operator ==(Object other) {');
+    lines.push('  bool operator ==(final Object other) {');
     lines.push('    if (identical(this, other)) return true;');
     lines.push('');
     lines.push(`    return other is ${cls.className}`);

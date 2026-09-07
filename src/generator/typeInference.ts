@@ -165,7 +165,7 @@ export class JsonToAstParser {
     return parsedClass;
   }
 
-  private parseProperty(key: string, value: unknown, parentClassName: string): ParsedProperty {
+  private parseProperty(key: string, value: unknown, _parentClassName: string): ParsedProperty {
     const dartFieldName = toCamelCase(key);
     let dartType = 'dynamic';
     let isNullable = this.options.nullability === 'nullable';
@@ -212,7 +212,7 @@ export class JsonToAstParser {
         if (sampleItem && typeof sampleItem === 'object' && !Array.isArray(sampleItem)) {
           // List of objects
           isObjectList = true;
-          const childNameCandidate = `${parentClassName}${toPascalCase(key)}Item`;
+          const childNameCandidate = toPascalCase(key);
           const childClassName = this.getUniqueClassName(childNameCandidate);
           const merged = mergeObjectArray(value);
           this.parseObject(childClassName, merged);
@@ -238,7 +238,7 @@ export class JsonToAstParser {
       isObject = true;
       if (this.options.nullability === 'smart') isNullable = false;
 
-      const childNameCandidate = `${parentClassName}${toPascalCase(key)}`;
+      const childNameCandidate = toPascalCase(key);
       const childClassName = this.getUniqueClassName(childNameCandidate);
       this.parseObject(childClassName, value as Record<string, unknown>);
 

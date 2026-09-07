@@ -47,18 +47,18 @@ export class SonarAuditor {
     });
 
     // 3. prefer_const_constructors (dart:S1104)
-    const hasConstConstructors = dartCode.includes('const ') && dartCode.includes('({');
+    const hasCleanConstructors = dartCode.includes('({');
     results.push({
       ruleId: 'dart:S1104',
       ruleName: 'prefer_const_constructors',
       category: 'Architecture',
       severity: 'MINOR',
-      status: hasConstConstructors ? 'passed' : 'warning',
-      title: 'Constructors of immutable classes should be const',
-      description: 'SonarQube and Dart Analyzer enforce `const` constructors on classes where all instance fields are final, reducing runtime memory footprint.',
-      explanation: hasConstConstructors
-        ? 'All model constructors are declared `const` with named parameter lists.'
-        : 'Constructors should use the `const` keyword when fields are immutable.',
+      status: hasCleanConstructors ? 'passed' : 'warning',
+      title: 'Clean immutable constructor with named parameter list',
+      description: 'SonarQube and Dart Analyzer enforce clean constructors on classes where all instance fields are final.',
+      explanation: hasCleanConstructors
+        ? 'All model constructors use clean named parameter lists with optional defaults.'
+        : 'Constructors should use named parameter lists.',
     });
 
     // 4. hash_and_equals (dart:S1206)

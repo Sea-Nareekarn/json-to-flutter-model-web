@@ -9,6 +9,23 @@ export interface SamplePreset {
 
 export const SAMPLE_PRESETS: SamplePreset[] = [
   {
+    id: 'crop_fill_check',
+    name: 'Crop Fill Check Detail',
+    nameTh: 'ตัวอย่าง Crop Fill Error (Nested List & Flags)',
+    description: 'มี nested List<DetailErrorList>, boolean flags, และ top-level helper functions',
+    defaultClassName: 'CropFillCheckDetailErrorModel',
+    json: JSON.stringify({
+      amountZero: false,
+      detailErrorList: [
+        {
+          randomAmountZero: true,
+          randomAmountOver: false,
+          notFoundAmountOver: false
+        }
+      ]
+    }, null, 2),
+  },
+  {
     id: 'ecommerce_order',
     name: 'E-Commerce Order',
     nameTh: 'คำสั่งซื้อสินค้า (E-Commerce)',
