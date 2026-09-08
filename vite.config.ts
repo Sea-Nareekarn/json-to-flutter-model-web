@@ -8,7 +8,8 @@ export default defineConfig(() => {
 
   let basePath = '/';
   if (isGitHubActions && !isVercel) {
-    basePath = '/json-to-flutter-model-web/';
+    const repoName = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : 'devtools';
+    basePath = `/${repoName}/`;
   }
 
   return {
