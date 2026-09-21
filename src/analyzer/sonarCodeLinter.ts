@@ -68,6 +68,41 @@ export class SonarDartLinter {
         });
       }
 
+      // 1.1 dart:S1303 - avoid_print in production code
+      const printMatch = line.match(/\bprint\s*\(/);
+      if (printMatch && !trimmed.startsWith('//')) {
+        issues.push({
+          id: `avoid-print-${lineNum}`,
+          lineNumber: lineNum,
+          severity: 'MAJOR',
+          ruleId: 'dart:S1303',
+          ruleName: 'avoid_print',
+          category: 'Maintainability',
+          title: 'Avoid print statements in production code',
+          message: 'พบการใช้ print() ซึ่งอาจทำให้ Log รั่วไหลและกระทบต่อ Performance',
+          explanation: 'แนะนำให้ใช้ Logger Service หรือ debugPrint() สำหรับการ Debug',
+          offendingText: trimmed,
+          suggestedFix: 'debugPrint(...) หรือ logger.info(...)',
+        });
+      }
+
+      // 1.2 dart:S1301 - prefer_single_quotes for imports & string literals
+      if (trimmed.startsWith('import "') || trimmed.startsWith("export \"") || /:\s*"[^"]*"/.test(line)) {
+        issues.push({
+          id: `single-quotes-${lineNum}`,
+          lineNumber: lineNum,
+          severity: 'INFO',
+          ruleId: 'dart:S1301',
+          ruleName: 'prefer_single_quotes',
+          category: 'Clean Code',
+          title: 'Prefer single quotes for string literals and imports',
+          message: 'พบการใช้ double quotes (") ใน string หรือ import statement',
+          explanation: 'ตาม Dart analyzer rules ควรใช้ single quotes (\') เป็นมาตรฐานหลัก',
+          offendingText: trimmed,
+          suggestedFix: trimmed.replace(/"/g, "'"),
+        });
+      }
+
       // 2. Class Declaration & dart:S101 (camel_case_types)
       const classMatch = line.match(/\bclass\s+([a-zA-Z0-9_$]+)/);
       if (classMatch) {
@@ -378,6 +413,9 @@ export class SonarDartLinter {
 
     // 4. Fix unsafe int casts: json['x'] as int -> (json['x'] as num?)?.toInt() ?? 0
     fixed = fixed.replace(/json\s*\[(['"][^'"]+['"])\]\s+as\s+int\b/g, '(json[$1] as num?)?.toInt() ?? 0');
+
+    // 5. Fix double quotes to single quotes in imports
+    fixed = fixed.replace(/import\s+"([^"]+)";/g, "import '$1';");
 
     return fixed;
   }

@@ -1,13 +1,25 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Search, CheckCircle2, XCircle, Copy, Check, AlertCircle } from 'lucide-react';
-import { SONAR_RULES_LIST } from '../../constants/sonarRulesData';
+import {
+  ShieldCheck,
+  Search,
+  CheckCircle2,
+  XCircle,
+  Copy,
+  Check,
+  AlertCircle,
+  FileCode,
+  Download,
+} from 'lucide-react';
+import { SONAR_RULES_LIST, FULL_ANALYSIS_OPTIONS_YAML } from '../../constants/sonarRulesData';
 
 export const SonarRulesExplorerTool: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showYamlViewer, setShowYamlViewer] = useState(false);
+  const [copiedYaml, setCopiedYaml] = useState(false);
 
-  const categories = ['All', 'Naming', 'Architecture', 'Type Safety', 'Clean Code'];
+  const categories = ['All', 'Naming', 'Architecture', 'Type Safety', 'Clean Code', 'Maintainability'];
 
   const filteredRules = SONAR_RULES_LIST.filter((rule) => {
     const matchesSearch =
@@ -28,6 +40,22 @@ export const SonarRulesExplorerTool: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleCopyYaml = async () => {
+    await navigator.clipboard.writeText(FULL_ANALYSIS_OPTIONS_YAML);
+    setCopiedYaml(true);
+    setTimeout(() => setCopiedYaml(false), 2000);
+  };
+
+  const handleDownloadYaml = () => {
+    const blob = new Blob([FULL_ANALYSIS_OPTIONS_YAML], { type: 'text/yaml;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'analysis_options.yaml';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header Info */}
@@ -38,22 +66,74 @@ export const SonarRulesExplorerTool: React.FC = () => {
             Dart SonarQube Rules Knowledge Base
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            คู่มือกฎ SonarQube &amp; Dart Analyzer ที่พบบ่อย พร้อมตัวอย่างโค้ดที่ถูกต้องและวิธีแก้
+            คู่มือกฎ SonarQube &amp; Dart Analyzer ทั้งหมด 130+ กฎ พร้อมตัวอย่างโค้ดและไฟล์ config
           </p>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative min-w-[280px]">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="ค้นหากฎ (เช่น S101, const, hash, naming)..."
-            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-900 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
-          />
+        {/* Action Controls & Search Bar */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* View Full analysis_options.yaml Button */}
+          <button
+            onClick={() => setShowYamlViewer(!showYamlViewer)}
+            className={`h-9 px-3 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition-all border ${
+              showYamlViewer
+                ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm'
+                : 'bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border-slate-300 dark:border-slate-700/80 shadow-xs'
+            }`}
+          >
+            <FileCode className="w-3.5 h-3.5 text-emerald-500" />
+            <span>analysis_options.yaml</span>
+          </button>
+
+          {/* Search Bar */}
+          <div className="relative min-w-[240px]">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="ค้นหากฎ (เช่น S101, const, final)..."
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-900 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+            />
+          </div>
         </div>
       </div>
+
+      {/* Full analysis_options.yaml Viewer Drawer */}
+      {showYamlViewer && (
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-3 animate-in fade-in duration-150">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-2">
+              <FileCode className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                Official analysis_options.yaml (130+ Strict Enterprise Rules)
+              </h3>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleCopyYaml}
+                className="h-7 px-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-xs flex items-center gap-1.5"
+              >
+                {copiedYaml ? <Check className="w-3 h-3 text-white" /> : <Copy className="w-3 h-3" />}
+                <span>{copiedYaml ? 'Copied!' : 'Copy YAML'}</span>
+              </button>
+              <button
+                onClick={handleDownloadYaml}
+                className="h-7 px-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-300 dark:border-slate-700 flex items-center gap-1.5"
+                title="Download analysis_options.yaml file"
+              >
+                <Download className="w-3 h-3" />
+                <span>Download .yaml</span>
+              </button>
+            </div>
+          </div>
+
+          <pre className="p-4 bg-slate-950 text-emerald-300 text-xs font-mono rounded-xl border border-slate-800 max-h-[350px] overflow-auto leading-relaxed">
+            {FULL_ANALYSIS_OPTIONS_YAML}
+          </pre>
+        </div>
+      )}
 
       {/* Category Pills */}
       <div className="flex flex-wrap gap-2">
