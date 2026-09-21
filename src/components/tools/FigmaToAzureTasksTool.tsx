@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Copy,
   Check,
@@ -13,6 +13,10 @@ import {
   ClipboardPaste,
   Kanban,
   CheckCircle2,
+  ShoppingCart,
+  Smartphone,
+  BarChart3,
+  ChevronDown,
 } from 'lucide-react';
 import {
   parseFigmaCards,
@@ -24,10 +28,28 @@ import {
   FigmaParserOptions,
 } from '../../generator/figmaCardParser';
 
-const SAMPLE_PRESETS = [
+interface SamplePresetItem {
+  id: string;
+  name: string;
+  subtitle: string;
+  badge: string;
+  category: string;
+  icon: React.FC<{ className?: string }>;
+  accentColor: string;
+  iconBg: string;
+  text: string;
+}
+
+const SAMPLE_PRESETS: SamplePresetItem[] = [
   {
     id: 'ecommerce_sprint',
-    name: '🛒 E-Commerce & Payment Flow',
+    name: 'E-Commerce & Checkout Flow',
+    subtitle: 'Payment Selector, Apple Pay, Cart Engine',
+    badge: '2 Tasks • 2.5 pts',
+    category: 'E-Commerce',
+    icon: ShoppingCart,
+    accentColor: 'text-emerald-400',
+    iconBg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
     text: `UI
 Checkout Screen
 Payment Gateway Selector
@@ -51,7 +73,13 @@ VAT & Shipping Fee
   },
   {
     id: 'mobile_auth',
-    name: '📱 Mobile Auth & Security',
+    name: 'Mobile Auth & Biometrics',
+    subtitle: 'Login, Biometrics, JWT Keyring, FaceID',
+    badge: '3 Tasks • 4.0 pts',
+    category: 'Mobile / Flutter',
+    icon: Smartphone,
+    accentColor: 'text-cyan-400',
+    iconBg: 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
     text: `UI
 Login & Register Screen
 Biometric Prompt
@@ -73,7 +101,13 @@ Hardware Keystore
   },
   {
     id: 'analytics_dashboard',
-    name: '📊 Analytics & Export System',
+    name: 'Analytics & Export System',
+    subtitle: 'Sales Chart, Date Filters, Excel Export',
+    badge: '3 Tasks • 4.0 pts',
+    category: 'Full-Stack',
+    icon: BarChart3,
+    accentColor: 'text-amber-400',
+    iconBg: 'bg-amber-500/10 border-amber-500/30 text-amber-400',
     text: `UI
 Sales Dashboard
 Revenue Chart & Summary Cards
@@ -97,12 +131,26 @@ Background Job Queue
 
 type OutputTab = 'json' | 'azure-csv' | 'jira-csv' | 'table' | 'azure-api';
 
-
 export const FigmaToAzureTasksTool: React.FC = () => {
+  const [selectedPresetId, setSelectedPresetId] = useState<string>(SAMPLE_PRESETS[0].id);
   const [rawInput, setRawInput] = useState<string>(SAMPLE_PRESETS[0].text);
   const [activeTab, setActiveTab] = useState<OutputTab>('json');
   const [copied, setCopied] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Parser Options
   const [options, setOptions] = useState<FigmaParserOptions>({
@@ -115,6 +163,10 @@ export const FigmaToAzureTasksTool: React.FC = () => {
     workitemType: 'Task',
     defaultActivity: 'Development',
   });
+
+  const selectedPreset = useMemo(() => {
+    return SAMPLE_PRESETS.find((p) => p.id === selectedPresetId) || SAMPLE_PRESETS[0];
+  }, [selectedPresetId]);
 
   // Parsed Cards State
   const cards: FigmaCardItem[] = useMemo(() => {
@@ -188,6 +240,14 @@ export const FigmaToAzureTasksTool: React.FC = () => {
     }
   };
 
+  const handleSelectPreset = (preset: SamplePresetItem) => {
+    setSelectedPresetId(preset.id);
+    setRawInput(preset.text);
+    setIsDropdownOpen(false);
+  };
+
+  const SelectedIcon = selectedPreset.icon;
+
   return (
     <div className="space-y-6">
       {/* Header Banner */}
@@ -211,27 +271,91 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
         {/* Action Controls */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Preset Select */}
-          <div className="relative">
-            <select
-              onChange={(e) => {
-                const selected = SAMPLE_PRESETS.find((p) => p.id === e.target.value);
-                if (selected) setRawInput(selected.text);
-              }}
-              defaultValue="ecommerce_sprint"
-              className="bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-medium"
+          {/* Custom Elegant Presets Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2.5 px-3 py-2 bg-slate-950/90 hover:bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/80 hover:border-emerald-500/60 shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/30 group"
             >
-              {SAMPLE_PRESETS.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
+              <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${selectedPreset.iconBg}`}>
+                <SelectedIcon className="w-3.5 h-3.5" />
+              </div>
+              <div className="text-left hidden sm:block">
+                <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold leading-none">
+                  Preset
+                </div>
+                <div className="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition-colors truncate max-w-[150px]">
+                  {selectedPreset.name}
+                </div>
+              </div>
+              <span className="sm:hidden text-xs font-bold">{selectedPreset.name}</span>
+              <ChevronDown
+                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                  isDropdownOpen ? 'rotate-180 text-emerald-400' : 'group-hover:text-slate-200'
+                }`}
+              />
+            </button>
+
+            {/* Dropdown Menu Popover */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 sm:left-0 top-full mt-2 w-80 sm:w-96 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-slate-700/90 shadow-2xl shadow-black/90 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-3 py-2 border-b border-slate-800/80 flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Template Presets</span>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700/50">
+                    {SAMPLE_PRESETS.length} Examples
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  {SAMPLE_PRESETS.map((p) => {
+                    const IconComponent = p.icon;
+                    const isSelected = p.id === selectedPresetId;
+
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => handleSelectPreset(p)}
+                        className={`w-full flex items-start gap-3 p-2.5 rounded-xl text-left transition-all ${
+                          isSelected
+                            ? 'bg-emerald-950/50 border border-emerald-500/40 text-slate-100 shadow-sm'
+                            : 'hover:bg-slate-800/80 border border-transparent text-slate-300 hover:text-white'
+                        }`}
+                      >
+                        <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 ${p.iconBg}`}>
+                          <IconComponent className="w-4 h-4" />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1 mb-0.5">
+                            <span className="text-xs font-bold text-slate-100 truncate">{p.name}</span>
+                            <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-slate-800/90 text-slate-300 shrink-0 border border-slate-700/50">
+                              {p.badge}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-400 leading-tight truncate">
+                            {p.subtitle}
+                          </p>
+                        </div>
+
+                        {isSelected && (
+                          <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shrink-0 mt-1.5">
+                            <Check className="w-3 h-3" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           <button
             onClick={() => setShowOptions(!showOptions)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${
               showOptions
                 ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-900/30'
                 : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
@@ -243,7 +367,7 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-emerald-900/30 transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-900/30 transition-all active:scale-95"
           >
             {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? 'Copied!' : 'Copy Output'}</span>
@@ -251,7 +375,7 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
           <button
             onClick={handleDownload}
-            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-colors"
+            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition-colors"
             title="Download Output"
           >
             <Download className="w-4 h-4" />
