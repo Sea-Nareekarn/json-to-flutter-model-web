@@ -26,21 +26,31 @@ export class PureDartGenerator {
     // 2. Top-Level Helper Functions
     if (isRootArray) {
       lines.push(`List<${rootClass.className}> ${rootVarName}FromJson(`);
-      lines.push('        final String str,) =>');
-      lines.push(`    List<${rootClass.className}>.from((json.decode(str) as List<dynamic>).map((final dynamic x) => ${rootClass.className}.fromJson(x as Map<String, dynamic>)));`);
+      lines.push('  final String str,');
+      lines.push(') =>');
+      lines.push(`    List<${rootClass.className}>.from(`);
+      lines.push(`      (json.decode(str) as List<dynamic>).map(`);
+      lines.push(`        (final dynamic x) => ${rootClass.className}.fromJson(x as Map<String, dynamic>),`);
+      lines.push('      ),');
+      lines.push('    );');
       lines.push('');
-      lines.push(`String ${rootVarName}ToJson(`);
-      lines.push(`        final List<${rootClass.className}> data,) =>`);
-      lines.push(`    json.encode(List<dynamic>.from(data.map((final ${rootClass.className} x) => x.toJson())));`);
+      lines.push(`List<Map<String, dynamic>> ${rootVarName}ToJson(`);
+      lines.push(`  final List<${rootClass.className}> data,`);
+      lines.push(') =>');
+      lines.push('    data');
+      lines.push(`        .map((final ${rootClass.className} item) => item.toJson())`);
+      lines.push('        .toList();');
       lines.push('');
     } else {
       lines.push(`${rootClass.className} ${rootVarName}FromJson(`);
-      lines.push('        final String str,) =>');
+      lines.push('  final String str,');
+      lines.push(') =>');
       lines.push(`    ${rootClass.className}.fromJson(json.decode(str) as Map<String, dynamic>);`);
       lines.push('');
-      lines.push(`String ${rootVarName}ToJson(`);
-      lines.push(`        final ${rootClass.className} data,) =>`);
-      lines.push('    json.encode(data.toJson());');
+      lines.push(`Map<String, dynamic> ${rootVarName}ToJson(`);
+      lines.push(`  final ${rootClass.className} data,`);
+      lines.push(') =>');
+      lines.push('    data.toJson();');
       lines.push('');
     }
 

@@ -201,6 +201,57 @@ Discount Engine
     failCount++;
   }
 
+  // 7. Test Root Array API Request Model & List<Map<String, dynamic>> ToJson
+  console.log('\n[TEST] Testing Root Array API Post Save Model...');
+  const apiSampleJson = JSON.stringify([
+    {
+      "orgCode": "7415",
+      "farm": "7415",
+      "house": "03",
+      "flock": "694",
+      "documentDate": "2026-01-01T17:00:00",
+      "detail": [
+        {
+          "damageType": "CULL",
+          "damageCode": "CULL_001",
+          "qty": 10
+        }
+      ]
+    }
+  ]);
+
+  try {
+    const apiResult = generateFlutterModel(apiSampleJson, {
+      rootClassName: 'DetailPostSaveRequestModel',
+      style: 'pure_dart',
+      nullability: 'smart',
+      generateCopyWith: true,
+      generateToString: false,
+      generateEquality: false,
+      generateToJson: true,
+      generateComments: false,
+      useImmutableAnnotation: false,
+      safeNumberParsing: true,
+      useExplicitToJson: true,
+      separateFiles: false,
+    });
+
+    if (!apiResult.code.includes('List<Map<String, dynamic>> detailPostSaveRequestModelToJson(')) {
+      throw new Error('detailPostSaveRequestModelToJson must return List<Map<String, dynamic>> for API body compatibility');
+    }
+    if (!apiResult.code.includes('.cast<Map<String, dynamic>>()') || !apiResult.code.includes('.map(Detail.fromJson)')) {
+      throw new Error('Nested detail list must use cast<Map<String, dynamic>>().map(Detail.fromJson)');
+    }
+
+    console.log('  ✓ Generated List<Map<String, dynamic>> ToJson for API Post Request');
+    console.log('  ✓ Generated clean tear-off .cast<Map<String, dynamic>>().map(Detail.fromJson)');
+    console.log('  ✓ Score:', apiResult.complianceScore + '%');
+    passCount++;
+  } catch (err: any) {
+    console.error(`  ✗ FAILED API Post Save Model Test: ${err.message}`);
+    failCount++;
+  }
+
   console.log(`\n========================================`);
   console.log(`Test Summary: ${passCount} Passed, ${failCount} Failed`);
   console.log(`========================================\n`);
