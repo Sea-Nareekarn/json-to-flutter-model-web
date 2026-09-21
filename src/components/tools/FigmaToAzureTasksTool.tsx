@@ -48,8 +48,8 @@ const SAMPLE_PRESETS: SamplePresetItem[] = [
     badge: '2 Tasks • 2.5 pts',
     category: 'E-Commerce',
     icon: ShoppingCart,
-    accentColor: 'text-emerald-400',
-    iconBg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
+    accentColor: 'text-emerald-600 dark:text-emerald-400',
+    iconBg: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400',
     text: `UI
 Checkout Screen
 Payment Gateway Selector
@@ -78,8 +78,8 @@ VAT & Shipping Fee
     badge: '3 Tasks • 4.0 pts',
     category: 'Mobile / Flutter',
     icon: Smartphone,
-    accentColor: 'text-cyan-400',
-    iconBg: 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
+    accentColor: 'text-cyan-600 dark:text-cyan-400',
+    iconBg: 'bg-cyan-50 dark:bg-cyan-500/10 border-cyan-200 dark:border-cyan-500/30 text-cyan-600 dark:text-cyan-400',
     text: `UI
 Login & Register Screen
 Biometric Prompt
@@ -106,8 +106,8 @@ Hardware Keystore
     badge: '3 Tasks • 4.0 pts',
     category: 'Full-Stack',
     icon: BarChart3,
-    accentColor: 'text-amber-400',
-    iconBg: 'bg-amber-500/10 border-amber-500/30 text-amber-400',
+    accentColor: 'text-amber-600 dark:text-amber-400',
+    iconBg: 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30 text-amber-600 dark:text-amber-400',
     text: `UI
 Sales Dashboard
 Revenue Chart & Summary Cards
@@ -251,20 +251,20 @@ export const FigmaToAzureTasksTool: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xl">
+      <div className="bg-white dark:bg-slate-900/80 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-sm dark:shadow-xl transition-colors duration-200">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+            <span className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
               <Kanban className="w-5 h-5" />
             </span>
-            <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               Figma Cards to Azure &amp; JSON Tasks
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
                 Sprint Planning Ready
               </span>
             </h2>
           </div>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-600 dark:text-slate-400">
             แปลงข้อความที่ Copy มาจากการ์ด Figma/FigJam ให้กลายเป็น JSON และ Azure DevOps / Jira Tasks พร้อมสกัด Title และ Effort อัตโนมัติ
           </p>
         </div>
@@ -275,7 +275,7 @@ export const FigmaToAzureTasksTool: React.FC = () => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2.5 px-3 py-2 bg-slate-950/90 hover:bg-slate-900 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/80 hover:border-emerald-500/60 shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/30 group"
+              className="flex items-center gap-2.5 px-3 py-2 bg-slate-50 dark:bg-slate-950/90 hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700/80 hover:border-emerald-500/60 shadow-sm dark:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/30 group"
             >
               <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${selectedPreset.iconBg}`}>
                 <SelectedIcon className="w-3.5 h-3.5" />
@@ -284,27 +284,27 @@ export const FigmaToAzureTasksTool: React.FC = () => {
                 <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold leading-none">
                   Preset
                 </div>
-                <div className="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition-colors truncate max-w-[150px]">
+                <div className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors truncate max-w-[150px]">
                   {selectedPreset.name}
                 </div>
               </div>
               <span className="sm:hidden text-xs font-bold">{selectedPreset.name}</span>
               <ChevronDown
                 className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
-                  isDropdownOpen ? 'rotate-180 text-emerald-400' : 'group-hover:text-slate-200'
+                  isDropdownOpen ? 'rotate-180 text-emerald-500 dark:text-emerald-400' : 'group-hover:text-slate-600 dark:group-hover:text-slate-200'
                 }`}
               />
             </button>
 
             {/* Dropdown Menu Popover */}
             {isDropdownOpen && (
-              <div className="absolute right-0 sm:left-0 top-full mt-2 w-80 sm:w-96 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-slate-700/90 shadow-2xl shadow-black/90 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div className="px-3 py-2 border-b border-slate-800/80 flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300">
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="absolute right-0 sm:left-0 top-full mt-2 w-80 sm:w-96 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-slate-700/90 shadow-2xl shadow-slate-400/20 dark:shadow-black/90 p-2 z-50 animate-in fade-in zoom-in-95 duration-150 text-slate-800 dark:text-slate-200">
+                <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                     <span>Template Presets</span>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700/50">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50">
                     {SAMPLE_PRESETS.length} Examples
                   </span>
                 </div>
@@ -320,8 +320,8 @@ export const FigmaToAzureTasksTool: React.FC = () => {
                         onClick={() => handleSelectPreset(p)}
                         className={`w-full flex items-start gap-3 p-2.5 rounded-xl text-left transition-all ${
                           isSelected
-                            ? 'bg-emerald-950/50 border border-emerald-500/40 text-slate-100 shadow-sm'
-                            : 'hover:bg-slate-800/80 border border-transparent text-slate-300 hover:text-white'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-500/40 text-emerald-900 dark:text-slate-100 shadow-sm'
+                            : 'hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-transparent text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 ${p.iconBg}`}>
@@ -330,18 +330,18 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-1 mb-0.5">
-                            <span className="text-xs font-bold text-slate-100 truncate">{p.name}</span>
-                            <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-slate-800/90 text-slate-300 shrink-0 border border-slate-700/50">
+                            <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">{p.name}</span>
+                            <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0 border border-slate-200 dark:border-slate-700/50">
                               {p.badge}
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-400 leading-tight truncate">
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight truncate">
                             {p.subtitle}
                           </p>
                         </div>
 
                         {isSelected && (
-                          <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shrink-0 mt-1.5">
+                          <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-500/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 mt-1.5">
                             <Check className="w-3 h-3" />
                           </div>
                         )}
@@ -357,8 +357,8 @@ export const FigmaToAzureTasksTool: React.FC = () => {
             onClick={() => setShowOptions(!showOptions)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${
               showOptions
-                ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-900/30'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                ? 'bg-emerald-600 text-white border-emerald-500 shadow-md'
+                : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700'
             }`}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -367,7 +367,7 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-900/30 transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition-all active:scale-95"
           >
             {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? 'Copied!' : 'Copy Output'}</span>
@@ -375,7 +375,7 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
           <button
             onClick={handleDownload}
-            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition-colors"
+            className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-300 dark:border-slate-700 transition-colors"
             title="Download Output"
           >
             <Download className="w-4 h-4" />
@@ -385,47 +385,47 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
       {/* Options Collapse Drawer */}
       {showOptions && (
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-4 shadow-lg animate-in fade-in duration-200">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-            <h3 className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-              <SlidersHorizontal className="w-4 h-4 text-emerald-400" />
+        <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-md animate-in fade-in duration-200 transition-colors">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+              <SlidersHorizontal className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
               Task Extraction &amp; Field Customization
             </h3>
-            <span className="text-[11px] text-slate-400">ปรับแต่ง Schema ให้ตรงกับ Azure DevOps / Jira</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">ปรับแต่ง Schema ให้ตรงกับ Azure DevOps / Jira</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
             {/* Title Key */}
             <div className="space-y-1">
-              <label className="text-slate-400 font-medium">JSON Title Key</label>
+              <label className="text-slate-600 dark:text-slate-400 font-medium">JSON Title Key</label>
               <input
                 type="text"
                 value={options.titleKey}
                 onChange={(e) => setOptions({ ...options, titleKey: e.target.value })}
                 placeholder="title (default)"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 font-mono focus:border-emerald-500 focus:outline-none"
+                className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-800 dark:text-slate-200 font-mono focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
             {/* Effort Key */}
             <div className="space-y-1">
-              <label className="text-slate-400 font-medium">JSON Effort Key</label>
+              <label className="text-slate-600 dark:text-slate-400 font-medium">JSON Effort Key</label>
               <input
                 type="text"
                 value={options.effortKey}
                 onChange={(e) => setOptions({ ...options, effortKey: e.target.value })}
                 placeholder="effort (default)"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 font-mono focus:border-emerald-500 focus:outline-none"
+                className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-800 dark:text-slate-200 font-mono focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
             {/* Work Item Type */}
             <div className="space-y-1">
-              <label className="text-slate-400 font-medium">Work Item Type</label>
+              <label className="text-slate-600 dark:text-slate-400 font-medium">Work Item Type</label>
               <select
                 value={options.workitemType}
                 onChange={(e) => setOptions({ ...options, workitemType: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:border-emerald-500 focus:outline-none"
+                className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-800 dark:text-slate-200 focus:border-emerald-500 focus:outline-none"
               >
                 <option value="Task">Task</option>
                 <option value="User Story">User Story</option>
@@ -436,11 +436,11 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
             {/* Default Activity */}
             <div className="space-y-1">
-              <label className="text-slate-400 font-medium">Default Activity</label>
+              <label className="text-slate-600 dark:text-slate-400 font-medium">Default Activity</label>
               <select
                 value={options.defaultActivity}
                 onChange={(e) => setOptions({ ...options, defaultActivity: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:border-emerald-500 focus:outline-none"
+                className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-800 dark:text-slate-200 focus:border-emerald-500 focus:outline-none"
               >
                 <option value="Development">Development</option>
                 <option value="Design">Design</option>
@@ -451,24 +451,24 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
             {/* Prefix */}
             <div className="space-y-1">
-              <label className="text-slate-400 font-medium">Prepend Prefix (e.g. [Sprint 1])</label>
+              <label className="text-slate-600 dark:text-slate-400 font-medium">Prepend Prefix (e.g. [Sprint 1])</label>
               <input
                 type="text"
                 value={options.prefix}
                 onChange={(e) => setOptions({ ...options, prefix: e.target.value })}
                 placeholder="[Sprint 1]"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:border-emerald-500 focus:outline-none"
+                className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-800 dark:text-slate-200 focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
             {/* Extract Type Toggle */}
             <div className="space-y-1 sm:col-span-2 flex flex-col justify-end">
-              <label className="flex items-center gap-2 cursor-pointer text-slate-300 py-1">
+              <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-300 py-1">
                 <input
                   type="checkbox"
                   checked={options.extractType}
                   onChange={(e) => setOptions({ ...options, extractType: e.target.checked })}
-                  className="rounded bg-slate-950 border-slate-700 text-emerald-600 focus:ring-0 w-4 h-4"
+                  className="rounded bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-emerald-600 focus:ring-0 w-4 h-4"
                 />
                 <span>แยกประเภท (`UI`, `Function`, `API`) ลงใน key <code>type</code> ใน JSON</span>
               </label>
@@ -479,61 +479,61 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
       {/* Metrics Summary Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
+        <div className="p-3.5 bg-white dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center justify-between shadow-sm transition-colors">
           <div>
-            <div className="text-[11px] text-slate-400 font-medium">Total Tasks</div>
-            <div className="text-xl font-black text-slate-100 mt-0.5">{totalTasks} Tasks</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Total Tasks</div>
+            <div className="text-xl font-black text-slate-900 dark:text-slate-100 mt-0.5">{totalTasks} Tasks</div>
           </div>
-          <Layers className="w-7 h-7 text-emerald-400/30" />
+          <Layers className="w-7 h-7 text-emerald-500/20 dark:text-emerald-400/30" />
         </div>
 
-        <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
+        <div className="p-3.5 bg-white dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center justify-between shadow-sm transition-colors">
           <div>
-            <div className="text-[11px] text-slate-400 font-medium">Total Effort / Points</div>
-            <div className="text-xl font-black text-emerald-400 mt-0.5">{totalEffort} pts</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Total Effort / Points</div>
+            <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">{totalEffort} pts</div>
           </div>
-          <Sparkles className="w-7 h-7 text-emerald-400/30" />
+          <Sparkles className="w-7 h-7 text-emerald-500/20 dark:text-emerald-400/30" />
         </div>
 
-        <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
+        <div className="p-3.5 bg-white dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center justify-between shadow-sm transition-colors">
           <div>
-            <div className="text-[11px] text-slate-400 font-medium">Avg Effort / Task</div>
-            <div className="text-xl font-black text-cyan-400 mt-0.5">{avgEffort} pts</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Avg Effort / Task</div>
+            <div className="text-xl font-black text-cyan-600 dark:text-cyan-400 mt-0.5">{avgEffort} pts</div>
           </div>
-          <Kanban className="w-7 h-7 text-cyan-400/30" />
+          <Kanban className="w-7 h-7 text-cyan-500/20 dark:text-cyan-400/30" />
         </div>
 
-        <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
+        <div className="p-3.5 bg-white dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center justify-between shadow-sm transition-colors">
           <div>
-            <div className="text-[11px] text-slate-400 font-medium">Est. Hours (1pt = 6h)</div>
-            <div className="text-xl font-black text-amber-400 mt-0.5">{totalEffort * 6} hrs</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Est. Hours (1pt = 6h)</div>
+            <div className="text-xl font-black text-amber-600 dark:text-amber-400 mt-0.5">{totalEffort * 6} hrs</div>
           </div>
-          <CheckCircle2 className="w-7 h-7 text-amber-400/30" />
+          <CheckCircle2 className="w-7 h-7 text-amber-500/20 dark:text-amber-400/30" />
         </div>
       </div>
 
       {/* Main Dual-Column Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Raw Figma Input */}
-        <div className="lg:col-span-5 bg-slate-900/70 rounded-2xl border border-slate-800 shadow-xl overflow-hidden flex flex-col">
-          <div className="px-4 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+        <div className="lg:col-span-5 bg-white dark:bg-slate-900/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl overflow-hidden flex flex-col transition-colors">
+          <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-bold text-slate-200">Raw Figma Text Input</span>
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Raw Figma Text Input</span>
             </div>
 
             <div className="flex items-center gap-1.5">
               <button
                 onClick={handlePasteFromClipboard}
-                className="flex items-center gap-1 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px] border border-slate-700 transition-colors"
+                className="flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-[11px] border border-slate-200 dark:border-slate-700 transition-colors shadow-xs"
                 title="Paste from clipboard"
               >
-                <ClipboardPaste className="w-3 h-3 text-emerald-400" />
+                <ClipboardPaste className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
                 <span>Paste</span>
               </button>
               <button
                 onClick={() => setRawInput('')}
-                className="p-1 bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-400 rounded border border-slate-700 transition-colors"
+                className="p-1 bg-white hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/60 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 rounded border border-slate-200 dark:border-slate-700 transition-colors"
                 title="Clear input"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -541,7 +541,7 @@ export const FigmaToAzureTasksTool: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-3 bg-slate-950/50">
+          <div className="p-3 bg-slate-50/50 dark:bg-slate-950/50">
             <textarea
               value={rawInput}
               onChange={(e) => setRawInput(e.target.value)}
@@ -562,27 +562,27 @@ VAT & Shipping Fee
 0.5"
               spellCheck={false}
               rows={18}
-              className="w-full bg-slate-950 text-slate-200 font-mono text-xs sm:text-sm p-3.5 rounded-xl border border-slate-800/80 leading-relaxed focus:outline-none focus:ring-1 focus:ring-emerald-500/50 resize-y"
+              className="w-full bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-mono text-xs sm:text-sm p-3.5 rounded-xl border border-slate-200 dark:border-slate-800/80 leading-relaxed focus:outline-none focus:ring-1 focus:ring-emerald-500/50 resize-y shadow-xs"
             />
           </div>
 
-          <div className="px-4 py-2 bg-slate-950/90 border-t border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-between font-mono">
+          <div className="px-4 py-2 bg-slate-50 dark:bg-slate-950/90 border-t border-slate-200 dark:border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-between font-mono">
             <span>{rawInput ? rawInput.split('\n').length : 0} lines</span>
             <span>Auto-parser: Real-time</span>
           </div>
         </div>
 
         {/* Right Column: Output Viewer */}
-        <div className="lg:col-span-7 bg-slate-900/70 rounded-2xl border border-slate-800 shadow-xl overflow-hidden flex flex-col">
+        <div className="lg:col-span-7 bg-white dark:bg-slate-900/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl overflow-hidden flex flex-col transition-colors">
           {/* Tabs Navigation */}
-          <div className="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+          <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-1">
               <button
                 onClick={() => setActiveTab('json')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   activeTab === 'json'
                     ? 'bg-emerald-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-slate-800'
                 }`}
               >
                 <FileJson className="w-3.5 h-3.5" />
@@ -594,7 +594,7 @@ VAT & Shipping Fee
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   activeTab === 'table'
                     ? 'bg-cyan-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-slate-800'
                 }`}
               >
                 <Layers className="w-3.5 h-3.5" />
@@ -606,7 +606,7 @@ VAT & Shipping Fee
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   activeTab === 'azure-csv'
                     ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-slate-800'
                 }`}
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -618,7 +618,7 @@ VAT & Shipping Fee
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   activeTab === 'jira-csv'
                     ? 'bg-amber-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-slate-800'
                 }`}
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -630,7 +630,7 @@ VAT & Shipping Fee
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   activeTab === 'azure-api'
                     ? 'bg-violet-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-slate-800'
                 }`}
               >
                 <FileJson className="w-3.5 h-3.5" />
@@ -640,22 +640,22 @@ VAT & Shipping Fee
           </div>
 
           {/* Tab Content Display */}
-          <div className="p-4 bg-slate-950/60 min-h-[460px]">
+          <div className="p-4 bg-slate-50/50 dark:bg-slate-950/60 min-h-[460px]">
             {activeTab === 'table' ? (
               /* Visual Cards & Interactive Table */
               <div className="space-y-3">
                 {cards.length === 0 ? (
-                  <div className="text-center py-16 text-slate-500 text-xs">
+                  <div className="text-center py-16 text-slate-400 dark:text-slate-500 text-xs">
                     ไม่มีการ์ดที่ถูกตรวจพบ กรุณาวางข้อความ Figma ในช่องด้านซ้าย
                   </div>
                 ) : (
                   cards.map((card, idx) => (
                     <div
                       key={card.id || idx}
-                      className="p-3.5 rounded-xl bg-slate-900 border border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-700 transition-colors"
+                      className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
                     >
                       <div className="flex items-start gap-3 flex-1 min-w-0">
-                        <span className="w-6 h-6 rounded-md bg-slate-800 text-slate-300 text-xs font-mono font-bold flex items-center justify-center shrink-0">
+                        <span className="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-mono font-bold flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
                           {idx + 1}
                         </span>
 
@@ -665,21 +665,21 @@ VAT & Shipping Fee
                               <span
                                 className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                                   card.type === 'UI'
-                                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                                    ? 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-500/10 dark:text-cyan-400 dark:border-cyan-500/20'
                                     : card.type === 'Function'
-                                    ? 'bg-violet-500/10 text-violet-400 border border-violet-500/20'
+                                    ? 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/20'
                                     : card.type === 'API'
-                                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                                    : 'bg-slate-800 text-slate-300'
-                                }`}
+                                    ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
+                                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                                } border`}
                               >
                                 {card.type}
                               </span>
                             )}
-                            <span className="text-[11px] text-slate-400">{card.activity}</span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400">{card.activity}</span>
                           </div>
 
-                          <div className="text-xs sm:text-sm font-semibold text-slate-100 break-words">
+                          <div className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-slate-100 break-words">
                             {card.title}
                           </div>
                         </div>
@@ -687,9 +687,9 @@ VAT & Shipping Fee
 
                       {/* Effort Pill */}
                       <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-black flex items-center gap-1">
+                        <div className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-mono text-xs font-black flex items-center gap-1 shadow-xs">
                           <span>{card.effort}</span>
-                          <span className="text-[10px] text-emerald-500/70 font-sans">pts</span>
+                          <span className="text-[10px] text-emerald-600/80 dark:text-emerald-500/70 font-sans">pts</span>
                         </div>
                       </div>
                     </div>
@@ -699,7 +699,7 @@ VAT & Shipping Fee
             ) : (
               /* Code / Text Output Display */
               <div className="relative h-full">
-                <pre className="p-4 bg-slate-950 text-slate-200 font-mono text-xs sm:text-sm rounded-xl border border-slate-800/90 overflow-x-auto leading-relaxed max-h-[500px]">
+                <pre className="p-4 bg-slate-900 dark:bg-slate-950 text-emerald-300 dark:text-emerald-300 font-mono text-xs sm:text-sm rounded-xl border border-slate-800/90 overflow-x-auto leading-relaxed max-h-[500px] shadow-sm">
                   {currentOutputContent}
                 </pre>
               </div>
@@ -707,14 +707,14 @@ VAT & Shipping Fee
           </div>
 
           {/* Footer Guide */}
-          <div className="px-4 py-3 bg-slate-900 border-t border-slate-800 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2 transition-colors">
             <div className="flex items-center gap-2">
-              <span className="text-emerald-400 font-bold">💡 How to use in Azure DevOps:</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">💡 How to use in Azure DevOps:</span>
               <span>Boards ➡️ Work Items ➡️ Import Work Items ➡️ เลือกไฟล์ CSV</span>
             </div>
             <button
               onClick={handleCopy}
-              className="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1"
+              className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold flex items-center gap-1"
             >
               <span>{copied ? 'คัดลอกเรียบร้อย!' : 'Copy to Clipboard'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
