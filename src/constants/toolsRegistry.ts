@@ -105,9 +105,9 @@ export const TOOLS_REGISTRY: ToolItem[] = [
   {
     id: 'json-to-typescript',
     route: '#/json-to-typescript',
-    title: 'JSON to TypeScript & Zod Schema',
-    titleTh: 'แปลง JSON เป็น TypeScript & Zod',
-    description: 'แปลง JSON เป็น TypeScript Interface / Type และ Zod Validation Schema สำหรับ Next.js App Router, Server Actions และ API Routes',
+    title: 'JSON to TypeScript Interfaces & Types',
+    titleTh: 'แปลง JSON เป็น TypeScript Interfaces & Types',
+    description: 'แปลง JSON เป็น TypeScript Interface และ Type Aliases คุณภาพสูงสำหรับ Next.js App Router, Server Actions, React และ Web API Routes',
     platform: 'web',
     category: 'nextjs',
     badge: 'Next.js 15 Ready',
@@ -116,8 +116,8 @@ export const TOOLS_REGISTRY: ToolItem[] = [
     popular: true,
     features: [
       'สร้าง TypeScript Interfaces แบบ Strict Type',
-      'สร้าง Zod Schema (`z.object({...})`) อัตโนมัติ',
-      'รองรับ Nested Objects และ Array types',
+      'รองรับ Interface และ Type Alias export',
+      'สวิตช์ Optional (?) และ Readonly properties',
       'เหมาะสำหรับ Next.js Server Actions & API',
     ],
   },

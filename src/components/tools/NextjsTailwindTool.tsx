@@ -87,32 +87,39 @@ ${parsedColors.map((c) => `  --${c.varName}: ${c.hex};`).join('\n')}
   return (
     <div className="space-y-6">
       {/* Header Info */}
-      <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-            <Brush className="w-5 h-5 text-cyan-400" />
-            Tailwind CSS &amp; Next.js Theme Generator
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+      <div className="bg-white dark:bg-slate-900/80 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm dark:shadow-xl transition-colors duration-200">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/20 text-cyan-600 dark:text-cyan-400">
+              <Brush className="w-5 h-5" />
+            </span>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              Tailwind CSS &amp; Next.js Theme Generator
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-cyan-50 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30">
+                Tailwind v3/v4
+              </span>
+            </h2>
+          </div>
+          <p className="text-xs text-slate-600 dark:text-slate-400">
             แปลง Color Tokens เป็น `tailwind.config.ts` และ CSS Variables สำหรับ Next.js 14/15
           </p>
         </div>
 
         {/* Action Toolbar */}
-        <div className="flex items-center gap-2">
-          <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
             <button
               onClick={() => setActiveTab('tailwind')}
-              className={`px-3 py-1 rounded-md font-semibold transition-all ${
-                activeTab === 'tailwind' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                activeTab === 'tailwind' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               tailwind.config.ts
             </button>
             <button
               onClick={() => setActiveTab('css')}
-              className={`px-3 py-1 rounded-md font-semibold transition-all ${
-                activeTab === 'css' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                activeTab === 'css' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               globals.css (:root)
@@ -121,7 +128,7 @@ ${parsedColors.map((c) => `  --${c.varName}: ${c.hex};`).join('\n')}
 
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-semibold shadow transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-600/20 transition-all active:scale-95"
           >
             {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? 'Copied!' : 'Copy'}</span>
@@ -132,31 +139,32 @@ ${parsedColors.map((c) => `  --${c.varName}: ${c.hex};`).join('\n')}
       {/* Main Dual-Pane */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         {/* Left: Input */}
-        <div className="flex flex-col h-full bg-slate-900/70 rounded-xl border border-slate-800 shadow-xl overflow-hidden p-4 space-y-4">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+        <div className="flex flex-col h-full bg-white dark:bg-slate-900/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl overflow-hidden p-4 space-y-4 transition-colors">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
             Color Palette Input (key: #HEX)
           </span>
           <textarea
             value={colorInput}
             onChange={(e) => setColorInput(e.target.value)}
             spellCheck={false}
-            className="w-full flex-1 min-h-[300px] p-3 bg-slate-950/90 text-slate-200 font-mono text-xs rounded-lg border border-slate-800 focus:outline-none focus:ring-1 focus:ring-cyan-500/40"
+            rows={12}
+            className="w-full flex-1 min-h-[300px] p-3.5 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-mono text-xs rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-cyan-500/40"
           />
 
           {/* Color Preview Swatches */}
           {parsedColors.length > 0 && (
-            <div className="p-3 bg-slate-950/60 rounded-lg border border-slate-800">
-              <span className="text-[11px] font-semibold text-slate-400 block mb-2">
+            <div className="p-3.5 bg-slate-50 dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+              <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-2">
                 Color Swatches ({parsedColors.length}):
               </span>
               <div className="flex flex-wrap gap-2">
                 {parsedColors.map((c) => (
                   <div
                     key={c.name}
-                    className="flex items-center gap-1.5 px-2 py-1 bg-slate-900 rounded-md border border-slate-800 text-[11px] font-mono text-slate-300"
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-700 dark:text-slate-300 shadow-xs"
                   >
                     <span
-                      className="w-3.5 h-3.5 rounded-full border border-white/20"
+                      className="w-3.5 h-3.5 rounded-full border border-slate-300 dark:border-white/20 shadow-inner"
                       style={{ backgroundColor: c.hex }}
                     />
                     <span>{c.name}</span>
@@ -168,14 +176,16 @@ ${parsedColors.map((c) => `  --${c.varName}: ${c.hex};`).join('\n')}
         </div>
 
         {/* Right: Output */}
-        <div className="flex flex-col h-full bg-slate-900/70 rounded-xl border border-slate-800 shadow-xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900 border-b border-slate-800">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+        <div className="flex flex-col h-full bg-white dark:bg-slate-900/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl overflow-hidden transition-colors">
+          <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
               Generated {activeTab === 'tailwind' ? 'Tailwind Config' : 'CSS Variables'}
             </span>
           </div>
-          <div className="p-4 flex-1 bg-slate-950/90 font-mono text-xs text-slate-200 overflow-auto min-h-[450px]">
-            <pre className="whitespace-pre text-cyan-200">{displayedCode}</pre>
+          <div className="p-3 flex-1 flex flex-col bg-slate-50/50 dark:bg-slate-950/50">
+            <pre className="p-4 flex-1 bg-slate-900 dark:bg-slate-950 font-mono text-xs text-cyan-200 dark:text-cyan-300 overflow-auto min-h-[450px] rounded-xl border border-slate-800/80 leading-relaxed shadow-sm">
+              {displayedCode}
+            </pre>
           </div>
         </div>
       </div>

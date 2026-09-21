@@ -128,7 +128,7 @@ export const App: React.FC = () => {
               onClick={() => handleSelectTool('json-to-typescript')}
               className="hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
             >
-              JSON to Next.js / Zod
+              JSON to TypeScript
             </button>
             <span>•</span>
             <button

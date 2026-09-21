@@ -58,7 +58,7 @@ assets/icons/ic_bell.svg`);
 
   const generatedColorsCode = `import 'package:flutter/material.dart';
 
-/// App-wide design system color tokens
+/// Clean static color tokens for Flutter
 abstract final class ${colorClassName} {
 ${parsedColors.map((c) => `  static const Color ${c.dartName} = ${c.flutterColor};`).join('\n')}
 }
@@ -70,9 +70,12 @@ ${parsedColors.map((c) => `  static const Color ${c.dartName} = ${c.flutterColor
   for (const line of assetLines) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('//')) continue;
-    const fileName = trimmed.split('/').pop() || trimmed;
-    const baseName = fileName.replace(/\.[^/.]+$/, '');
-    const dartName = toCamelCase(baseName);
+
+    // Extract filename without extension for dart property name
+    const filename = trimmed.split('/').pop() || trimmed;
+    const nameWithoutExt = filename.split('.').slice(0, -1).join('.') || filename;
+    const dartName = toCamelCase(nameWithoutExt);
+
     parsedAssets.push({
       path: trimmed,
       dartName,
@@ -96,25 +99,32 @@ ${parsedAssets.map((a) => `  static const String ${a.dartName} = '${a.path}';`).
   return (
     <div className="space-y-6">
       {/* Header Info */}
-      <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-            <Palette className="w-5 h-5 text-cyan-400" />
-            Flutter Colors &amp; Assets Generator
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+      <div className="bg-white dark:bg-slate-900/80 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm dark:shadow-xl transition-colors duration-200">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/20 text-cyan-600 dark:text-cyan-400">
+              <Palette className="w-5 h-5" />
+            </span>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              Flutter Colors &amp; Assets Generator
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-cyan-50 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30">
+                Flutter Clean Code
+              </span>
+            </h2>
+          </div>
+          <p className="text-xs text-slate-600 dark:text-slate-400">
             แปลง Palette สีและ Asset Paths ให้เป็น Dart Class สำเร็จรูป ปลอดภัย ไร้ Typo
           </p>
         </div>
 
         {/* SubTab Selector */}
-        <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
+        <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs shrink-0">
           <button
             onClick={() => setActiveSubTab('colors')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
               activeSubTab === 'colors'
-                ? 'bg-cyan-600 text-white shadow'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-cyan-600 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             <Palette className="w-3.5 h-3.5" />
@@ -122,10 +132,10 @@ ${parsedAssets.map((a) => `  static const String ${a.dartName} = '${a.path}';`).
           </button>
           <button
             onClick={() => setActiveSubTab('assets')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
               activeSubTab === 'assets'
-                ? 'bg-cyan-600 text-white shadow'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-cyan-600 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             <ImageIcon className="w-3.5 h-3.5" />
@@ -137,13 +147,13 @@ ${parsedAssets.map((a) => `  static const String ${a.dartName} = '${a.path}';`).
       {/* Main Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         {/* Left Pane: Input */}
-        <div className="flex flex-col h-full bg-slate-900/70 rounded-xl border border-slate-800 shadow-xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900 border-b border-slate-800">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+        <div className="flex flex-col h-full bg-white dark:bg-slate-900/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl overflow-hidden transition-colors">
+          <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
               {activeSubTab === 'colors' ? 'Color Palette Input (key: #HEX)' : 'Asset Paths Input (1 per line)'}
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400 font-medium">Class:</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Class:</span>
               <input
                 type="text"
                 value={activeSubTab === 'colors' ? colorClassName : assetClassName}
@@ -151,12 +161,12 @@ ${parsedAssets.map((a) => `  static const String ${a.dartName} = '${a.path}';`).
                   if (activeSubTab === 'colors') setColorClassName(e.target.value);
                   else setAssetClassName(e.target.value);
                 }}
-                className="bg-slate-950 border border-slate-700/80 rounded px-2 py-0.5 text-xs text-cyan-300 font-mono focus:outline-none w-28"
+                className="bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs text-cyan-600 dark:text-cyan-300 font-mono font-bold focus:outline-none w-32 shadow-xs"
               />
             </div>
           </div>
 
-          <div className="p-3 flex-1 flex flex-col">
+          <div className="p-3 flex-1 flex flex-col bg-slate-50/50 dark:bg-slate-950/50">
             <textarea
               value={activeSubTab === 'colors' ? colorInput : assetInput}
               onChange={(e) => {
@@ -164,13 +174,14 @@ ${parsedAssets.map((a) => `  static const String ${a.dartName} = '${a.path}';`).
                 else setAssetInput(e.target.value);
               }}
               spellCheck={false}
-              className="w-full flex-1 min-h-[300px] p-3 bg-slate-950/90 text-slate-200 font-mono text-xs leading-relaxed resize-none rounded-lg border border-slate-800 focus:outline-none focus:ring-1 focus:ring-cyan-500/40"
+              rows={12}
+              className="w-full flex-1 min-h-[300px] p-3.5 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-mono text-xs sm:text-sm leading-relaxed resize-none rounded-xl border border-slate-200 dark:border-slate-800/80 focus:outline-none focus:ring-1 focus:ring-cyan-500/40 shadow-xs"
             />
 
             {/* Live Color Swatches for Color Mode */}
             {activeSubTab === 'colors' && parsedColors.length > 0 && (
-              <div className="mt-3 p-3 bg-slate-950/60 rounded-lg border border-slate-800">
-                <span className="text-[11px] font-semibold text-slate-400 block mb-2">
+              <div className="mt-3 p-3.5 bg-white dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+                <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-2">
                   Live Color Previews ({parsedColors.length}):
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -179,10 +190,10 @@ ${parsedAssets.map((a) => `  static const String ${a.dartName} = '${a.path}';`).
                     return (
                       <div
                         key={c.dartName}
-                        className="flex items-center gap-1.5 px-2 py-1 bg-slate-900 rounded-md border border-slate-800 text-[11px] font-mono text-slate-300 shadow-sm"
+                        className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-700 dark:text-slate-300 shadow-xs"
                       >
                         <span
-                          className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-inner"
+                          className="w-3.5 h-3.5 rounded-full border border-slate-300 dark:border-white/20 shadow-inner shrink-0"
                           style={{ backgroundColor: cssHex }}
                         />
                         <span>{c.dartName}</span>
@@ -196,22 +207,24 @@ ${parsedAssets.map((a) => `  static const String ${a.dartName} = '${a.path}';`).
         </div>
 
         {/* Right Pane: Dart Code Viewer */}
-        <div className="flex flex-col h-full bg-slate-900/70 rounded-xl border border-slate-800 shadow-xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900 border-b border-slate-800">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+        <div className="flex flex-col h-full bg-white dark:bg-slate-900/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl overflow-hidden transition-colors">
+          <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
               Generated Dart Code
             </span>
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-white rounded-md text-xs font-semibold shadow transition-all active:scale-95"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-600/20 transition-all active:scale-95"
             >
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied!' : 'Copy Code'}</span>
             </button>
           </div>
 
-          <div className="p-4 flex-1 bg-slate-950/90 font-mono text-xs text-slate-200 overflow-auto min-h-[350px]">
-            <pre className="whitespace-pre">{displayedCode}</pre>
+          <div className="p-3 flex-1 flex flex-col bg-slate-50/50 dark:bg-slate-950/50">
+            <pre className="p-4 flex-1 bg-slate-900 dark:bg-slate-950 font-mono text-xs sm:text-sm text-cyan-200 dark:text-cyan-300 overflow-auto min-h-[350px] rounded-xl border border-slate-800/80 leading-relaxed shadow-sm">
+              {displayedCode}
+            </pre>
           </div>
         </div>
       </div>

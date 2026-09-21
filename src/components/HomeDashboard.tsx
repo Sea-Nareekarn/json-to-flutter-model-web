@@ -95,7 +95,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({ onSelectTool }) =>
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ค้นหาเครื่องมือ (เช่น JSON to Flutter, TypeScript Zod, Tailwind, JWT)..."
+                placeholder="ค้นหาเครื่องมือ (เช่น JSON to Flutter, TypeScript, Tailwind, JWT)..."
                 className="w-full bg-white dark:bg-slate-950/90 border border-slate-300 dark:border-slate-700/80 rounded-xl pl-12 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 shadow-md dark:shadow-xl transition-all"
               />
             </div>
