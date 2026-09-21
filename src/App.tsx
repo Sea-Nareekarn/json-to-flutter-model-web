@@ -137,6 +137,13 @@ export const App: React.FC = () => {
             >
               JWT Decoder
             </button>
+            <span>•</span>
+            <button
+              onClick={() => handleSelectTool('figma-to-azure')}
+              className="hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors font-semibold"
+            >
+              Figma to Azure
+            </button>
           </div>
         </div>
       </footer>
