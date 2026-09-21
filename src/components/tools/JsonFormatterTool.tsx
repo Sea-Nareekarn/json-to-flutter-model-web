@@ -1,5 +1,18 @@
-import React, { useState } from 'react';
-import { Minimize2, ArrowDownAZ, Copy, Check, Download, Trash2, AlertCircle, FileCode2 } from 'lucide-react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import {
+  Minimize2,
+  ArrowDownAZ,
+  Copy,
+  Check,
+  Download,
+  Trash2,
+  AlertCircle,
+  FileCode2,
+  Target,
+  Sparkles,
+  CheckCircle2,
+} from 'lucide-react';
+import { parseJsonError, attemptFixJson } from '../../utils/jsonErrorParser';
 
 export const JsonFormatterTool: React.FC = () => {
   const [input, setInput] = useState<string>(`{
@@ -17,27 +30,111 @@ export const JsonFormatterTool: React.FC = () => {
 }`);
   const [indentSize, setIndentSize] = useState<number>(2);
   const [copied, setCopied] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [cursorPos, setCursorPos] = useState({ line: 1, col: 1, selected: 0 });
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const gutterRef = useRef<HTMLDivElement>(null);
+
+  // Compute stats and error reactively
+  const { isValid, keyCount, error } = useMemo(() => {
+    if (!input.trim()) {
+      return { isValid: false, keyCount: 0, error: null };
+    }
+    try {
+      const p = JSON.parse(input);
+      let count = 0;
+      const countKeys = (o: unknown) => {
+        if (typeof o === 'object' && o !== null) {
+          if (Array.isArray(o)) {
+            o.forEach(countKeys);
+          } else {
+            count += Object.keys(o).length;
+            Object.values(o).forEach(countKeys);
+          }
+        }
+      };
+      countKeys(p);
+      return { isValid: true, keyCount: count, error: null };
+    } catch (err: unknown) {
+      const e = err as Error;
+      return { isValid: false, keyCount: 0, error: e.message };
+    }
+  }, [input]);
+
+  const errorInfo = useMemo(() => {
+    return error ? parseJsonError(error, input) : null;
+  }, [error, input]);
+
+  const autoFixResult = useMemo(() => {
+    if (!error) return null;
+    return attemptFixJson(input);
+  }, [error, input]);
+
+  const lines = useMemo(() => {
+    return input ? input.split('\n') : [''];
+  }, [input]);
+
+  const lineCount = lines.length;
+  const byteCount = new Blob([input]).size;
+
+  const handleScroll = () => {
+    if (textareaRef.current && gutterRef.current) {
+      gutterRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  };
+
+  const updateCursorPosition = (el: HTMLTextAreaElement) => {
+    const selStart = el.selectionStart || 0;
+    const selEnd = el.selectionEnd || 0;
+    const textBefore = el.value.slice(0, selStart);
+    const lineList = textBefore.split('\n');
+    const currentLine = lineList.length;
+    const currentCol = lineList[lineList.length - 1].length + 1;
+    const selected = Math.abs(selEnd - selStart);
+
+    setCursorPos({ line: currentLine, col: currentCol, selected });
+  };
+
+  const jumpToLine = (targetLine: number, targetCol = 1) => {
+    if (!textareaRef.current) return;
+    const textarea = textareaRef.current;
+    let charOffset = 0;
+
+    for (let i = 0; i < targetLine - 1 && i < lines.length; i++) {
+      charOffset += lines[i].length + 1;
+    }
+    charOffset += Math.max(0, targetCol - 1);
+    charOffset = Math.min(charOffset, input.length);
+
+    textarea.focus();
+    textarea.setSelectionRange(charOffset, charOffset);
+
+    const lineHeightPx = 24;
+    const targetScroll = Math.max(0, (targetLine - 4) * lineHeightPx);
+    textarea.scrollTo({
+      top: targetScroll,
+      behavior: 'smooth',
+    });
+
+    updateCursorPosition(textarea);
+  };
 
   const formatJson = (space: number) => {
     try {
-      setError(null);
       const parsed = JSON.parse(input);
       setInput(JSON.stringify(parsed, null, space));
-    } catch (err: unknown) {
-      const e = err as Error;
-      setError(e.message);
+    } catch {
+      if (autoFixResult?.success && autoFixResult.fixed) {
+        setInput(autoFixResult.fixed);
+      }
     }
   };
 
   const minifyJson = () => {
     try {
-      setError(null);
       const parsed = JSON.parse(input);
       setInput(JSON.stringify(parsed));
-    } catch (err: unknown) {
-      const e = err as Error;
-      setError(e.message);
+    } catch {
+      // keep as is
     }
   };
 
@@ -57,13 +154,11 @@ export const JsonFormatterTool: React.FC = () => {
 
   const sortJsonKeys = () => {
     try {
-      setError(null);
       const parsed = JSON.parse(input);
       const sorted = sortKeysRecursively(parsed);
       setInput(JSON.stringify(sorted, null, indentSize));
-    } catch (err: unknown) {
-      const e = err as Error;
-      setError(e.message);
+    } catch {
+      // keep as is
     }
   };
 
@@ -84,29 +179,17 @@ export const JsonFormatterTool: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  // Compute stats
-  let keyCount = 0;
-  let isValid = false;
-  try {
-    const p = JSON.parse(input);
-    isValid = true;
-    const countKeys = (o: unknown) => {
-      if (typeof o === 'object' && o !== null) {
-        if (Array.isArray(o)) {
-          o.forEach(countKeys);
-        } else {
-          keyCount += Object.keys(o).length;
-          Object.values(o).forEach(countKeys);
-        }
-      }
-    };
-    countKeys(p);
-  } catch {
-    isValid = false;
-  }
+  const handleApplyAutoFix = () => {
+    if (autoFixResult?.success && autoFixResult.fixed) {
+      setInput(autoFixResult.fixed);
+    }
+  };
 
-  const lineCount = input ? input.split('\n').length : 0;
-  const byteCount = new Blob([input]).size;
+  useEffect(() => {
+    if (textareaRef.current && gutterRef.current) {
+      gutterRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  }, [lines.length]);
 
   return (
     <div className="space-y-6">
@@ -125,7 +208,7 @@ export const JsonFormatterTool: React.FC = () => {
             </h2>
           </div>
           <p className="text-xs text-slate-600 dark:text-slate-400">
-            จัดรูปแบบให้สวยงาม ตรวจสอบความถูกต้อง เรียง Keys และคำนวณสถิติ
+            จัดรูปแบบให้สวยงาม ตรวจสอบความถูกต้อง เรียง Keys และระบุตำแหน่งข้อผิดพลาดแบบ Real-time
           </p>
         </div>
 
@@ -133,7 +216,10 @@ export const JsonFormatterTool: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
             <button
-              onClick={() => { setIndentSize(2); formatJson(2); }}
+              onClick={() => {
+                setIndentSize(2);
+                formatJson(2);
+              }}
               className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                 indentSize === 2
                   ? 'bg-indigo-600 text-white shadow-sm'
@@ -143,7 +229,10 @@ export const JsonFormatterTool: React.FC = () => {
               2 Spaces
             </button>
             <button
-              onClick={() => { setIndentSize(4); formatJson(4); }}
+              onClick={() => {
+                setIndentSize(4);
+                formatJson(4);
+              }}
               className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                 indentSize === 4
                   ? 'bg-indigo-600 text-white shadow-sm'
@@ -201,9 +290,13 @@ export const JsonFormatterTool: React.FC = () => {
       {/* Editor & Metrics */}
       <div className="bg-white dark:bg-slate-900/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl overflow-hidden flex flex-col transition-colors">
         {/* Top Status Bar */}
-        <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-xs font-mono">
+        <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-xs font-mono select-none">
           <div className="flex items-center gap-3">
-            <span className={`flex items-center gap-1.5 font-bold ${isValid ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+            <span
+              className={`flex items-center gap-1.5 font-bold ${
+                isValid ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+              }`}
+            >
               <span className={`w-2 h-2 rounded-full ${isValid ? 'bg-emerald-500' : 'bg-rose-500'}`} />
               {isValid ? 'Valid JSON' : 'Invalid JSON'}
             </span>
@@ -216,37 +309,140 @@ export const JsonFormatterTool: React.FC = () => {
           </div>
         </div>
 
-        {/* Text Area */}
-        <div className="relative min-h-[500px] p-3 bg-slate-50/50 dark:bg-slate-950/50">
+        {/* Text Area with Line Gutter */}
+        <div className="relative flex min-h-[500px] bg-slate-50/70 dark:bg-slate-950/70 overflow-hidden">
+          {/* Line Gutter */}
+          <div
+            ref={gutterRef}
+            className="w-11 sm:w-13 bg-slate-100/90 dark:bg-slate-900/90 py-3.5 font-mono text-xs select-none border-r border-slate-200 dark:border-slate-800 overflow-hidden shrink-0"
+            aria-hidden="true"
+          >
+            {lines.map((_, idx) => {
+              const lineNum = idx + 1;
+              const isErrorLine = errorInfo?.line === lineNum;
+              const isCursorLine = cursorPos.line === lineNum;
+
+              return (
+                <div
+                  key={lineNum}
+                  onClick={() => jumpToLine(lineNum)}
+                  className={`h-6 leading-6 px-1.5 text-right cursor-pointer flex items-center justify-end gap-1 transition-colors ${
+                    isErrorLine
+                      ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold border-l-2 border-rose-500 pl-1'
+                      : isCursorLine
+                      ? 'bg-slate-200/60 dark:bg-slate-800/60 text-slate-800 dark:text-slate-200 font-medium'
+                      : 'text-slate-400 dark:text-slate-600 hover:text-slate-700 dark:hover:text-slate-300'
+                  }`}
+                  title={
+                    isErrorLine
+                      ? `Error on line ${lineNum}: ${errorInfo?.message}`
+                      : `Click to go to line ${lineNum}`
+                  }
+                >
+                  {isErrorLine && <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />}
+                  <span className="text-[11px] sm:text-xs">{lineNum}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Text Area */}
           <textarea
+            ref={textareaRef}
             value={input}
             onChange={(e) => {
               setInput(e.target.value);
-              try {
-                JSON.parse(e.target.value);
-                setError(null);
-              } catch (err: unknown) {
-                const errorObj = err as Error;
-                setError(errorObj.message);
-              }
+              updateCursorPosition(e.target);
             }}
+            onKeyUp={(e) => updateCursorPosition(e.currentTarget)}
+            onClick={(e) => updateCursorPosition(e.currentTarget)}
+            onSelect={(e) => updateCursorPosition(e.currentTarget)}
+            onScroll={handleScroll}
             placeholder="วาง JSON ที่ต้องการจัดรูปแบบที่นี่..."
             spellCheck={false}
-            className="w-full h-full min-h-[500px] p-4 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-mono text-xs sm:text-sm leading-relaxed resize-y rounded-xl border border-slate-200 dark:border-slate-800/80 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 shadow-xs"
+            className="flex-1 w-full h-full py-3.5 px-3 bg-transparent text-slate-900 dark:text-slate-100 font-mono text-xs sm:text-sm leading-6 resize-none focus:outline-none selection:bg-indigo-500/30 overflow-auto whitespace-pre"
           />
+        </div>
 
-          {error && (
-            <div className="absolute bottom-6 left-6 right-6 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/90 border border-rose-300 dark:border-rose-600/60 text-rose-800 dark:text-rose-200 text-xs flex items-start gap-2.5 shadow-xl backdrop-blur-sm">
-              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
-              <div>
-                <div className="font-bold text-rose-700 dark:text-rose-300">JSON Syntax Error</div>
-                <div className="font-mono text-[11px] text-rose-600 dark:text-rose-200/90 mt-0.5">
-                  {error}
+        {/* Docked Status / Error Bar */}
+        {error && errorInfo ? (
+          <div className="px-4 py-3 bg-rose-50 dark:bg-rose-950/90 border-t border-rose-200 dark:border-rose-900/60 text-rose-900 dark:text-rose-200 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              {/* Error Details */}
+              <div className="flex items-start gap-2.5 min-w-0">
+                <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-xs text-rose-800 dark:text-rose-200">
+                      JSON Syntax Error
+                    </span>
+                    {errorInfo.line !== null && (
+                      <button
+                        onClick={() => jumpToLine(errorInfo.line!, errorInfo.column || 1)}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-100 dark:bg-rose-900/60 hover:bg-rose-200 dark:hover:bg-rose-800/80 text-rose-800 dark:text-rose-200 border border-rose-300 dark:border-rose-700/60 text-[11px] font-mono font-semibold transition-colors"
+                        title="คลิกเพื่อเลื่อน Cursor ไปยังบรรทัดนี้"
+                      >
+                        <Target className="w-3 h-3 text-rose-600 dark:text-rose-400" />
+                        บรรทัดที่ {errorInfo.line}
+                        {errorInfo.column !== null ? `:${errorInfo.column}` : ''}
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs text-rose-700 dark:text-rose-300 mt-0.5">
+                    {errorInfo.thaiHint}
+                  </p>
+                  <p
+                    className="text-[11px] font-mono text-rose-600 dark:text-rose-400/90 mt-0.5 truncate"
+                    title={errorInfo.message}
+                  >
+                    {errorInfo.message}
+                  </p>
                 </div>
               </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                {errorInfo.line !== null && (
+                  <button
+                    onClick={() => jumpToLine(errorInfo.line!, errorInfo.column || 1)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                  >
+                    <Target className="w-3.5 h-3.5" />
+                    <span>ไปที่บรรทัดผิด</span>
+                  </button>
+                )}
+
+                {autoFixResult?.success && (
+                  <button
+                    onClick={handleApplyAutoFix}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold shadow-xs transition-colors"
+                    title="ซ่อมแซม Trailing comma, เครื่องหมายคำพูด, หรือวงเล็บอัตโนมัติ"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>ซ่อม JSON อัตโนมัติ</span>
+                  </button>
+                )}
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between px-4 py-2 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 font-mono select-none">
+            <div className="flex items-center gap-3">
+              <span>
+                Ln {cursorPos.line}, Col {cursorPos.col}
+              </span>
+              {cursorPos.selected > 0 && (
+                <span className="text-indigo-600 dark:text-indigo-400">
+                  ({cursorPos.selected} selected)
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Valid JSON</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

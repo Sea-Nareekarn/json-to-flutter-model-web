@@ -1,6 +1,7 @@
 import { generateFlutterModel } from './generator';
 import { SAMPLE_PRESETS } from './constants/sampleJson';
 import { parseFigmaCards, formatCardsToJson } from './generator/figmaCardParser';
+import { parseJsonError, attemptFixJson } from './utils/jsonErrorParser';
 
 export function runTests(): boolean {
   console.log('=== Running Generator & SonarQube Compliance Tests ===\n');
@@ -252,10 +253,53 @@ Discount Engine
     failCount++;
   }
 
+// 8. Test JSON Error Parser & Auto-Fix Utility
+  console.log('\n[TEST] Testing JSON Error Parser & Auto-Fix Utilities...');
+  try {
+    const brokenJsonMissingComma = `[
+  {
+    "orgCode": "7415",
+    "farm": "7415"
+    "house": "03"
+  }
+]`;
+    let sampleError = '';
+    try {
+      JSON.parse(brokenJsonMissingComma);
+    } catch (e: any) {
+      sampleError = e.message;
+    }
+
+    const parsedErr = parseJsonError(sampleError, brokenJsonMissingComma);
+    if (parsedErr.line !== 5 && parsedErr.line !== 4) {
+      throw new Error(`Expected error line 4 or 5, but got line ${parsedErr.line}`);
+    }
+    console.log(`  ✓ Identified syntax error at Line ${parsedErr.line}, Col ${parsedErr.column}`);
+    console.log(`  ✓ Friendly hint: "${parsedErr.thaiHint}"`);
+
+    // Test Auto-Fix on single quotes & trailing comma
+    const brokenSingleQuotes = `{\n  'name': 'Somchai',\n  'age': 30,\n}`;
+    const fixRes = attemptFixJson(brokenSingleQuotes);
+    if (!fixRes.success || !fixRes.fixed) {
+      throw new Error('Auto-fix failed to repair single quotes and trailing comma');
+    }
+    const fixedObj = JSON.parse(fixRes.fixed);
+    if (fixedObj.name !== 'Somchai' || fixedObj.age !== 30) {
+      throw new Error('Auto-fix produced incorrect JSON values');
+    }
+    console.log('  ✓ Auto-fix successfully repaired single quotes and trailing comma');
+
+    passCount++;
+  } catch (err: any) {
+    console.error(`  ✗ FAILED JSON Error Parser Test: ${err.message}`);
+    failCount++;
+  }
+
   console.log(`\n========================================`);
   console.log(`Test Summary: ${passCount} Passed, ${failCount} Failed`);
   console.log(`========================================\n`);
 
   return failCount === 0;
 }
+
 
