@@ -1,5 +1,6 @@
 import { generateFlutterModel } from './generator';
 import { SAMPLE_PRESETS } from './constants/sampleJson';
+import { parseFigmaCards, formatCardsToJson } from './generator/figmaCardParser';
 
 export function runTests(): boolean {
   console.log('=== Running Generator & SonarQube Compliance Tests ===\n');
@@ -141,9 +142,69 @@ export function runTests(): boolean {
     passCount++;
   }
 
+  // 6. Test Figma Card to Azure / JSON Parser (User's exact test case)
+  console.log('\n[TEST] Testing Figma Card to Azure DevOps & JSON Parser...');
+  const userFigmaInput = `UI
+BreederFarm\u00A0
+Feeding
+Header Overview
+
+
+
+
+
+2
+Function
+BreederFarm\u00A0
+Feeding
+
+
+
+
+
+0.5`;
+
+  try {
+    const figmaCards = parseFigmaCards(userFigmaInput);
+    if (figmaCards.length !== 2) {
+      throw new Error(`Expected 2 cards parsed, but got ${figmaCards.length}`);
+    }
+
+    if (figmaCards[0].title !== 'UI BreederFarm Feeding Header Overview') {
+      throw new Error(`Card 1 title mismatch: "${figmaCards[0].title}"`);
+    }
+    if (figmaCards[0].effort !== 2) {
+      throw new Error(`Card 1 effort mismatch: ${figmaCards[0].effort}`);
+    }
+
+    if (figmaCards[1].title !== 'Function BreederFarm Feeding') {
+      throw new Error(`Card 2 title mismatch: "${figmaCards[1].title}"`);
+    }
+    if (figmaCards[1].effort !== 0.5) {
+      throw new Error(`Card 2 effort mismatch: ${figmaCards[1].effort}`);
+    }
+
+    const jsonOutput = formatCardsToJson(figmaCards);
+    const parsedJson = JSON.parse(jsonOutput);
+    if (parsedJson[0].title !== 'UI BreederFarm Feeding Header Overview' || parsedJson[0].effort !== 2) {
+      throw new Error(`JSON output mismatch for Card 1`);
+    }
+    if (parsedJson[1].title !== 'Function BreederFarm Feeding' || parsedJson[1].effort !== 0.5) {
+      throw new Error(`JSON output mismatch for Card 2`);
+    }
+
+    console.log('  ✓ User sample parsed exactly: Card 1 (Effort 2), Card 2 (Effort 0.5)');
+    console.log('  ✓ JSON Structure & Output verified');
+    passCount++;
+  } catch (err: any) {
+    console.error(`  ✗ FAILED Figma Parser Test: ${err.message}`);
+    failCount++;
+  }
+
   console.log(`\n========================================`);
   console.log(`Test Summary: ${passCount} Passed, ${failCount} Failed`);
   console.log(`========================================\n`);
 
   return failCount === 0;
 }
+

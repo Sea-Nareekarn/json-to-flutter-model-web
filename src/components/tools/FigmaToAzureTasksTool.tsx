@@ -1,0 +1,608 @@
+import React, { useState, useMemo } from 'react';
+import {
+  Copy,
+  Check,
+  Download,
+  Trash2,
+  Sparkles,
+  SlidersHorizontal,
+  FileJson,
+  FileSpreadsheet,
+  Layers,
+  ArrowRight,
+  ClipboardPaste,
+  Kanban,
+  CheckCircle2,
+} from 'lucide-react';
+import {
+  parseFigmaCards,
+  formatCardsToJson,
+  formatCardsToAzureCsv,
+  formatCardsToJiraCsv,
+  formatCardsToAzureApiJson,
+  FigmaCardItem,
+  FigmaParserOptions,
+} from '../../generator/figmaCardParser';
+
+const SAMPLE_PRESETS = [
+  {
+    id: 'user_breeder_farm',
+    name: '🌟 Figma Cards (BreederFarm Feeding)',
+    text: `UI
+BreederFarm\u00A0
+Feeding
+Header Overview
+
+
+
+
+
+2
+Function
+BreederFarm\u00A0
+Feeding
+
+
+
+
+
+0.5`,
+  },
+  {
+    id: 'ecommerce_sprint',
+    name: '🛒 E-Commerce Sprint Cards',
+    text: `UI
+Checkout Screen
+Payment Gateway Selector
+Apple Pay & Credit Card
+
+
+3
+Function
+Cart Calculation
+Discount Coupon Engine
+VAT & Shipping Fee
+
+
+2
+API
+Order Submission
+Idempotency Key & Retry Logic
+
+
+1.5
+QA
+End-to-End Payment Testing
+Scenario Sandbox
+
+
+0.5`,
+  },
+  {
+    id: 'mobile_auth',
+    name: '📱 Mobile Auth & Biometrics',
+    text: `UI
+Login & Register Screen
+Biometric Prompt
+
+
+1
+Function
+JWT Refresh Token Flow
+Secure Storage Keyring
+
+
+2
+Function
+FaceID / Fingerprint Auth
+Hardware Keystore
+
+
+1`,
+  },
+];
+
+type OutputTab = 'json' | 'azure-csv' | 'jira-csv' | 'table' | 'azure-api';
+
+export const FigmaToAzureTasksTool: React.FC = () => {
+  const [rawInput, setRawInput] = useState<string>(SAMPLE_PRESETS[0].text);
+  const [activeTab, setActiveTab] = useState<OutputTab>('json');
+  const [copied, setCopied] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+
+  // Parser Options
+  const [options, setOptions] = useState<FigmaParserOptions>({
+    titleKey: 'title',
+    effortKey: 'effort',
+    extractType: false,
+    defaultEffort: 1,
+    prefix: '',
+    suffix: '',
+    workitemType: 'Task',
+    defaultActivity: 'Development',
+  });
+
+  // Parsed Cards State
+  const cards: FigmaCardItem[] = useMemo(() => {
+    return parseFigmaCards(rawInput, options);
+  }, [rawInput, options]);
+
+  // Statistics
+  const totalTasks = cards.length;
+  const totalEffort = useMemo(() => {
+    return cards.reduce((sum, c) => sum + (c.effort || 0), 0);
+  }, [cards]);
+  const avgEffort = totalTasks > 0 ? (totalEffort / totalTasks).toFixed(2) : '0';
+
+  // Generated Output Strings
+  const generatedJson = useMemo(() => formatCardsToJson(cards, options), [cards, options]);
+  const generatedAzureCsv = useMemo(() => formatCardsToAzureCsv(cards, options), [cards, options]);
+  const generatedJiraCsv = useMemo(() => formatCardsToJiraCsv(cards, options), [cards, options]);
+  const generatedAzureApi = useMemo(() => formatCardsToAzureApiJson(cards, options), [cards, options]);
+
+  const currentOutputContent = useMemo(() => {
+    switch (activeTab) {
+      case 'json':
+        return generatedJson;
+      case 'azure-csv':
+        return generatedAzureCsv;
+      case 'jira-csv':
+        return generatedJiraCsv;
+      case 'azure-api':
+        return generatedAzureApi;
+      case 'table':
+        return generatedJson;
+      default:
+        return generatedJson;
+    }
+  }, [activeTab, generatedJson, generatedAzureCsv, generatedJiraCsv, generatedAzureApi]);
+
+  const handleCopy = async () => {
+    if (!currentOutputContent) return;
+    await navigator.clipboard.writeText(currentOutputContent);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    let filename = 'tasks.json';
+    let mime = 'application/json';
+    let content = currentOutputContent;
+
+    if (activeTab === 'azure-csv' || activeTab === 'jira-csv') {
+      filename = `${activeTab === 'azure-csv' ? 'azure-tasks' : 'jira-tasks'}.csv`;
+      mime = 'text/csv;charset=utf-8;';
+    } else if (activeTab === 'azure-api') {
+      filename = 'azure-devops-batch.json';
+    }
+
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handlePasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) setRawInput(text);
+    } catch {
+      // ignore
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header Banner */}
+      <div className="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xl">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+              <Kanban className="w-5 h-5" />
+            </span>
+            <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+              Figma Cards to Azure &amp; JSON Tasks
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                Sprint Planning Ready
+              </span>
+            </h2>
+          </div>
+          <p className="text-xs text-slate-400">
+            แปลงข้อความที่ Copy มาจากการ์ด Figma/FigJam ให้กลายเป็น JSON และ Azure DevOps / Jira Tasks พร้อมสกัด Title และ Effort อัตโนมัติ
+          </p>
+        </div>
+
+        {/* Action Controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Preset Select */}
+          <div className="relative">
+            <select
+              onChange={(e) => {
+                const selected = SAMPLE_PRESETS.find((p) => p.id === e.target.value);
+                if (selected) setRawInput(selected.text);
+              }}
+              defaultValue="user_breeder_farm"
+              className="bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-medium"
+            >
+              {SAMPLE_PRESETS.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={() => setShowOptions(!showOptions)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-all ${
+              showOptions
+                ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-900/30'
+                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+            }`}
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <span>Options</span>
+          </button>
+
+          <button
+            onClick={handleCopy}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-emerald-900/30 transition-all active:scale-95"
+          >
+            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+            <span>{copied ? 'Copied!' : 'Copy Output'}</span>
+          </button>
+
+          <button
+            onClick={handleDownload}
+            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-colors"
+            title="Download Output"
+          >
+            <Download className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Options Collapse Drawer */}
+      {showOptions && (
+        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-4 shadow-lg animate-in fade-in duration-200">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+            <h3 className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+              <SlidersHorizontal className="w-4 h-4 text-emerald-400" />
+              Task Extraction &amp; Field Customization
+            </h3>
+            <span className="text-[11px] text-slate-400">ปรับแต่ง Schema ให้ตรงกับ Azure DevOps / Jira</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+            {/* Title Key */}
+            <div className="space-y-1">
+              <label className="text-slate-400 font-medium">JSON Title Key</label>
+              <input
+                type="text"
+                value={options.titleKey}
+                onChange={(e) => setOptions({ ...options, titleKey: e.target.value })}
+                placeholder="title (default)"
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 font-mono focus:border-emerald-500 focus:outline-none"
+              />
+            </div>
+
+            {/* Effort Key */}
+            <div className="space-y-1">
+              <label className="text-slate-400 font-medium">JSON Effort Key</label>
+              <input
+                type="text"
+                value={options.effortKey}
+                onChange={(e) => setOptions({ ...options, effortKey: e.target.value })}
+                placeholder="effort (default)"
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 font-mono focus:border-emerald-500 focus:outline-none"
+              />
+            </div>
+
+            {/* Work Item Type */}
+            <div className="space-y-1">
+              <label className="text-slate-400 font-medium">Work Item Type</label>
+              <select
+                value={options.workitemType}
+                onChange={(e) => setOptions({ ...options, workitemType: e.target.value })}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:border-emerald-500 focus:outline-none"
+              >
+                <option value="Task">Task</option>
+                <option value="User Story">User Story</option>
+                <option value="Bug">Bug</option>
+                <option value="Feature">Feature</option>
+              </select>
+            </div>
+
+            {/* Default Activity */}
+            <div className="space-y-1">
+              <label className="text-slate-400 font-medium">Default Activity</label>
+              <select
+                value={options.defaultActivity}
+                onChange={(e) => setOptions({ ...options, defaultActivity: e.target.value })}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:border-emerald-500 focus:outline-none"
+              >
+                <option value="Development">Development</option>
+                <option value="Design">Design</option>
+                <option value="Testing">Testing</option>
+                <option value="Documentation">Documentation</option>
+              </select>
+            </div>
+
+            {/* Prefix */}
+            <div className="space-y-1">
+              <label className="text-slate-400 font-medium">Prepend Prefix (e.g. [Sprint 1])</label>
+              <input
+                type="text"
+                value={options.prefix}
+                onChange={(e) => setOptions({ ...options, prefix: e.target.value })}
+                placeholder="[Sprint 1]"
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:border-emerald-500 focus:outline-none"
+              />
+            </div>
+
+            {/* Extract Type Toggle */}
+            <div className="space-y-1 sm:col-span-2 flex flex-col justify-end">
+              <label className="flex items-center gap-2 cursor-pointer text-slate-300 py-1">
+                <input
+                  type="checkbox"
+                  checked={options.extractType}
+                  onChange={(e) => setOptions({ ...options, extractType: e.target.checked })}
+                  className="rounded bg-slate-950 border-slate-700 text-emerald-600 focus:ring-0 w-4 h-4"
+                />
+                <span>แยกประเภท (`UI`, `Function`, `API`) ลงใน key <code>type</code> ใน JSON</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Metrics Summary Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] text-slate-400 font-medium">Total Tasks</div>
+            <div className="text-xl font-black text-slate-100 mt-0.5">{totalTasks} Tasks</div>
+          </div>
+          <Layers className="w-7 h-7 text-emerald-400/30" />
+        </div>
+
+        <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] text-slate-400 font-medium">Total Effort / Points</div>
+            <div className="text-xl font-black text-emerald-400 mt-0.5">{totalEffort} pts</div>
+          </div>
+          <Sparkles className="w-7 h-7 text-emerald-400/30" />
+        </div>
+
+        <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] text-slate-400 font-medium">Avg Effort / Task</div>
+            <div className="text-xl font-black text-cyan-400 mt-0.5">{avgEffort} pts</div>
+          </div>
+          <Kanban className="w-7 h-7 text-cyan-400/30" />
+        </div>
+
+        <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] text-slate-400 font-medium">Est. Hours (1pt = 6h)</div>
+            <div className="text-xl font-black text-amber-400 mt-0.5">{totalEffort * 6} hrs</div>
+          </div>
+          <CheckCircle2 className="w-7 h-7 text-amber-400/30" />
+        </div>
+      </div>
+
+      {/* Main Dual-Column Workspace */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Raw Figma Input */}
+        <div className="lg:col-span-5 bg-slate-900/70 rounded-2xl border border-slate-800 shadow-xl overflow-hidden flex flex-col">
+          <div className="px-4 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-bold text-slate-200">Raw Figma Text Input</span>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={handlePasteFromClipboard}
+                className="flex items-center gap-1 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px] border border-slate-700 transition-colors"
+                title="Paste from clipboard"
+              >
+                <ClipboardPaste className="w-3 h-3 text-emerald-400" />
+                <span>Paste</span>
+              </button>
+              <button
+                onClick={() => setRawInput('')}
+                className="p-1 bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-400 rounded border border-slate-700 transition-colors"
+                title="Clear input"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-3 bg-slate-950/50">
+            <textarea
+              value={rawInput}
+              onChange={(e) => setRawInput(e.target.value)}
+              placeholder="วางข้อความที่ Copy มาจากการ์ดใน Figma / FigJam ที่นี่...
+
+ตัวอย่าง:
+UI
+BreederFarm
+Feeding
+Header Overview
+
+2
+Function
+BreederFarm
+Feeding
+
+0.5"
+              spellCheck={false}
+              rows={18}
+              className="w-full bg-slate-950 text-slate-200 font-mono text-xs sm:text-sm p-3.5 rounded-xl border border-slate-800/80 leading-relaxed focus:outline-none focus:ring-1 focus:ring-emerald-500/50 resize-y"
+            />
+          </div>
+
+          <div className="px-4 py-2 bg-slate-950/90 border-t border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-between font-mono">
+            <span>{rawInput ? rawInput.split('\n').length : 0} lines</span>
+            <span>Auto-parser: Real-time</span>
+          </div>
+        </div>
+
+        {/* Right Column: Output Viewer */}
+        <div className="lg:col-span-7 bg-slate-900/70 rounded-2xl border border-slate-800 shadow-xl overflow-hidden flex flex-col">
+          {/* Tabs Navigation */}
+          <div className="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-1">
+              <button
+                onClick={() => setActiveTab('json')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === 'json'
+                    ? 'bg-emerald-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                <FileJson className="w-3.5 h-3.5" />
+                <span>JSON (Direct Output)</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('table')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === 'table'
+                    ? 'bg-cyan-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Visual Cards ({totalTasks})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('azure-csv')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === 'azure-csv'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>Azure DevOps CSV</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('jira-csv')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === 'jira-csv'
+                    ? 'bg-amber-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>Jira CSV</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('azure-api')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === 'azure-api'
+                    ? 'bg-violet-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                <FileJson className="w-3.5 h-3.5" />
+                <span>Azure API Batch</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Tab Content Display */}
+          <div className="p-4 bg-slate-950/60 min-h-[460px]">
+            {activeTab === 'table' ? (
+              /* Visual Cards & Interactive Table */
+              <div className="space-y-3">
+                {cards.length === 0 ? (
+                  <div className="text-center py-16 text-slate-500 text-xs">
+                    ไม่มีการ์ดที่ถูกตรวจพบ กรุณาวางข้อความ Figma ในช่องด้านซ้าย
+                  </div>
+                ) : (
+                  cards.map((card, idx) => (
+                    <div
+                      key={card.id || idx}
+                      className="p-3.5 rounded-xl bg-slate-900 border border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-700 transition-colors"
+                    >
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <span className="w-6 h-6 rounded-md bg-slate-800 text-slate-300 text-xs font-mono font-bold flex items-center justify-center shrink-0">
+                          {idx + 1}
+                        </span>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            {card.type && (
+                              <span
+                                className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                                  card.type === 'UI'
+                                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                                    : card.type === 'Function'
+                                    ? 'bg-violet-500/10 text-violet-400 border border-violet-500/20'
+                                    : card.type === 'API'
+                                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                    : 'bg-slate-800 text-slate-300'
+                                }`}
+                              >
+                                {card.type}
+                              </span>
+                            )}
+                            <span className="text-[11px] text-slate-400">{card.activity}</span>
+                          </div>
+
+                          <div className="text-xs sm:text-sm font-semibold text-slate-100 break-words">
+                            {card.title}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Effort Pill */}
+                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-black flex items-center gap-1">
+                          <span>{card.effort}</span>
+                          <span className="text-[10px] text-emerald-500/70 font-sans">pts</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            ) : (
+              /* Code / Text Output Display */
+              <div className="relative h-full">
+                <pre className="p-4 bg-slate-950 text-slate-200 font-mono text-xs sm:text-sm rounded-xl border border-slate-800/90 overflow-x-auto leading-relaxed max-h-[500px]">
+                  {currentOutputContent}
+                </pre>
+              </div>
+            )}
+          </div>
+
+          {/* Footer Guide */}
+          <div className="px-4 py-3 bg-slate-900 border-t border-slate-800 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-emerald-400 font-bold">💡 How to use in Azure DevOps:</span>
+              <span>Boards ➡️ Work Items ➡️ Import Work Items ➡️ เลือกไฟล์ CSV</span>
+            </div>
+            <button
+              onClick={handleCopy}
+              className="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1"
+            >
+              <span>{copied ? 'คัดลอกเรียบร้อย!' : 'Copy to Clipboard'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

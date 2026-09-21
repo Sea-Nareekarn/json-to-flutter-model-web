@@ -16,7 +16,8 @@ import {
   Globe,
   Layers,
   Lock,
-  Cpu
+  Cpu,
+  Kanban
 } from 'lucide-react';
 
 interface HomeDashboardProps {
@@ -41,6 +42,8 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({ onSelectTool }) =>
         return <Brush className="w-6 h-6 text-cyan-500 dark:text-cyan-300" />;
       case 'KeyRound':
         return <KeyRound className="w-6 h-6 text-amber-500 dark:text-amber-300" />;
+      case 'Kanban':
+        return <Kanban className="w-6 h-6 text-emerald-500 dark:text-emerald-300" />;
       case 'ShieldCheck':
       default:
         return <ShieldCheck className="w-6 h-6 text-emerald-500 dark:text-emerald-300" />;

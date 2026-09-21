@@ -11,6 +11,7 @@ import { SonarRulesExplorerTool } from './components/tools/SonarRulesExplorerToo
 import { JsonToTypescriptTool } from './components/tools/JsonToTypescriptTool';
 import { NextjsTailwindTool } from './components/tools/NextjsTailwindTool';
 import { SvgToReactTool } from './components/tools/SvgToReactTool';
+import { FigmaToAzureTasksTool } from './components/tools/FigmaToAzureTasksTool';
 
 export const App: React.FC = () => {
   const { isDark, toggleTheme } = useTheme();
@@ -68,6 +69,8 @@ export const App: React.FC = () => {
         return <JsonFormatterTool />;
       case 'jwt-decoder':
         return <JwtEncoderTool />;
+      case 'figma-to-azure':
+        return <FigmaToAzureTasksTool />;
 
       default:
         return <HomeDashboard onSelectTool={handleSelectTool} />;
