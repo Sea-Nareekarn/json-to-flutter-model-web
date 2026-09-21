@@ -26,61 +26,32 @@ import {
 
 const SAMPLE_PRESETS = [
   {
-    id: 'user_breeder_farm',
-    name: '🌟 Figma Cards (BreederFarm Feeding)',
-    text: `UI
-BreederFarm\u00A0
-Feeding
-Header Overview
-
-
-
-
-
-2
-Function
-BreederFarm\u00A0
-Feeding
-
-
-
-
-
-0.5`,
-  },
-  {
     id: 'ecommerce_sprint',
-    name: '🛒 E-Commerce Sprint Cards',
+    name: '🛒 E-Commerce & Payment Flow',
     text: `UI
 Checkout Screen
 Payment Gateway Selector
 Apple Pay & Credit Card
 
 
-3
+
+
+
+2
 Function
 Cart Calculation
 Discount Coupon Engine
 VAT & Shipping Fee
 
 
-2
-API
-Order Submission
-Idempotency Key & Retry Logic
 
-
-1.5
-QA
-End-to-End Payment Testing
-Scenario Sandbox
 
 
 0.5`,
   },
   {
     id: 'mobile_auth',
-    name: '📱 Mobile Auth & Biometrics',
+    name: '📱 Mobile Auth & Security',
     text: `UI
 Login & Register Screen
 Biometric Prompt
@@ -100,9 +71,32 @@ Hardware Keystore
 
 1`,
   },
+  {
+    id: 'analytics_dashboard',
+    name: '📊 Analytics & Export System',
+    text: `UI
+Sales Dashboard
+Revenue Chart & Summary Cards
+
+
+2
+Function
+Date Range Filter
+Weekly & Monthly Aggregation
+
+
+1.5
+API
+Export Data to Excel
+Background Job Queue
+
+
+0.5`,
+  },
 ];
 
 type OutputTab = 'json' | 'azure-csv' | 'jira-csv' | 'table' | 'azure-api';
+
 
 export const FigmaToAzureTasksTool: React.FC = () => {
   const [rawInput, setRawInput] = useState<string>(SAMPLE_PRESETS[0].text);
@@ -224,7 +218,7 @@ export const FigmaToAzureTasksTool: React.FC = () => {
                 const selected = SAMPLE_PRESETS.find((p) => p.id === e.target.value);
                 if (selected) setRawInput(selected.text);
               }}
-              defaultValue="user_breeder_farm"
+              defaultValue="ecommerce_sprint"
               className="bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-medium"
             >
               {SAMPLE_PRESETS.map((p) => (
@@ -431,14 +425,15 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
 ตัวอย่าง:
 UI
-BreederFarm
-Feeding
-Header Overview
+Checkout Screen
+Payment Gateway Selector
+Apple Pay & Credit Card
 
 2
 Function
-BreederFarm
-Feeding
+Cart Calculation
+Discount Coupon Engine
+VAT & Shipping Fee
 
 0.5"
               spellCheck={false}

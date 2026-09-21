@@ -142,11 +142,11 @@ export function runTests(): boolean {
     passCount++;
   }
 
-  // 6. Test Figma Card to Azure / JSON Parser (User's exact test case)
+  // 6. Test Figma Card to Azure / JSON Parser (Multi-line and float effort parsing)
   console.log('\n[TEST] Testing Figma Card to Azure DevOps & JSON Parser...');
-  const userFigmaInput = `UI
-BreederFarm\u00A0
-Feeding
+  const genericFigmaInput = `UI
+Checkout Screen\u00A0
+Payment Gateway
 Header Overview
 
 
@@ -155,8 +155,8 @@ Header Overview
 
 2
 Function
-BreederFarm\u00A0
-Feeding
+Cart Calculation\u00A0
+Discount Engine
 
 
 
@@ -165,19 +165,19 @@ Feeding
 0.5`;
 
   try {
-    const figmaCards = parseFigmaCards(userFigmaInput);
+    const figmaCards = parseFigmaCards(genericFigmaInput);
     if (figmaCards.length !== 2) {
       throw new Error(`Expected 2 cards parsed, but got ${figmaCards.length}`);
     }
 
-    if (figmaCards[0].title !== 'UI BreederFarm Feeding Header Overview') {
+    if (figmaCards[0].title !== 'UI Checkout Screen Payment Gateway Header Overview') {
       throw new Error(`Card 1 title mismatch: "${figmaCards[0].title}"`);
     }
     if (figmaCards[0].effort !== 2) {
       throw new Error(`Card 1 effort mismatch: ${figmaCards[0].effort}`);
     }
 
-    if (figmaCards[1].title !== 'Function BreederFarm Feeding') {
+    if (figmaCards[1].title !== 'Function Cart Calculation Discount Engine') {
       throw new Error(`Card 2 title mismatch: "${figmaCards[1].title}"`);
     }
     if (figmaCards[1].effort !== 0.5) {
@@ -186,14 +186,14 @@ Feeding
 
     const jsonOutput = formatCardsToJson(figmaCards);
     const parsedJson = JSON.parse(jsonOutput);
-    if (parsedJson[0].title !== 'UI BreederFarm Feeding Header Overview' || parsedJson[0].effort !== 2) {
+    if (parsedJson[0].title !== 'UI Checkout Screen Payment Gateway Header Overview' || parsedJson[0].effort !== 2) {
       throw new Error(`JSON output mismatch for Card 1`);
     }
-    if (parsedJson[1].title !== 'Function BreederFarm Feeding' || parsedJson[1].effort !== 0.5) {
+    if (parsedJson[1].title !== 'Function Cart Calculation Discount Engine' || parsedJson[1].effort !== 0.5) {
       throw new Error(`JSON output mismatch for Card 2`);
     }
 
-    console.log('  ✓ User sample parsed exactly: Card 1 (Effort 2), Card 2 (Effort 0.5)');
+    console.log('  ✓ Multi-line cards & float effort parsed: Card 1 (2 pts), Card 2 (0.5 pts)');
     console.log('  ✓ JSON Structure & Output verified');
     passCount++;
   } catch (err: any) {
