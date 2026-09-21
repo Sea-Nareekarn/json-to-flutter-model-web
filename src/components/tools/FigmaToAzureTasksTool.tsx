@@ -9,7 +9,6 @@ import {
   FileJson,
   FileSpreadsheet,
   Layers,
-  ArrowRight,
   ClipboardPaste,
   Kanban,
   CheckCircle2,
@@ -569,8 +568,9 @@ VAT & Shipping Fee
 
         {/* Right Column: Output Viewer */}
         <div className="lg:col-span-7 bg-white dark:bg-slate-900/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl overflow-hidden flex flex-col transition-colors">
-          {/* Tabs Navigation */}
+          {/* Tabs Navigation & Action Toolbar */}
           <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+            {/* Tabs List */}
             <div className="flex flex-wrap items-center gap-1">
               <button
                 onClick={() => setActiveTab('json')}
@@ -618,6 +618,35 @@ VAT & Shipping Fee
               >
                 <FileJson className="w-3.5 h-3.5" />
                 <span>Azure API Batch</span>
+              </button>
+            </div>
+
+            {/* Quick Action Controls on Top Right */}
+            <div className="flex items-center gap-1.5 ml-auto">
+              <button
+                onClick={handleCopy}
+                className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all active:scale-95 inline-flex items-center gap-1.5 whitespace-nowrap flex-shrink-0"
+                title="Copy output content"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-white" />
+                    <span>Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Copy</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={handleDownload}
+                className="h-8 px-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors border border-slate-300 dark:border-slate-700/60 inline-flex items-center justify-center flex-shrink-0 shadow-sm"
+                title="Download output file"
+              >
+                <Download className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -690,18 +719,9 @@ VAT & Shipping Fee
           </div>
 
           {/* Footer Guide */}
-          <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2 transition-colors">
-            <div className="flex items-center gap-2">
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">💡 How to use in Azure DevOps:</span>
-              <span>Boards ➡️ Work Items ➡️ Import Work Items ➡️ เลือกไฟล์ CSV</span>
-            </div>
-            <button
-              onClick={handleCopy}
-              className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold flex items-center gap-1"
-            >
-              <span>{copied ? 'คัดลอกเรียบร้อย!' : 'Copy to Clipboard'}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+          <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 flex items-center gap-2 transition-colors">
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold">💡 How to use in Azure DevOps:</span>
+            <span>Boards ➡️ Work Items ➡️ Import Work Items ➡️ เลือกไฟล์ CSV</span>
           </div>
         </div>
       </div>
