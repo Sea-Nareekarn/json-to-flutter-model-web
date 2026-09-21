@@ -201,7 +201,7 @@ export const TOOLS_REGISTRY: ToolItem[] = [
     route: '#/figma-to-azure',
     title: 'Figma Cards to Azure & JSON Tasks',
     titleTh: 'แปลงการ์ด Figma เป็น Azure Tasks & JSON',
-    description: 'สกัด Title และ Effort (Story Points / Hours) จากการ์ด Figma และ FigJam ให้เป็น JSON, Azure DevOps CSV และ Jira CSV สำหรับวางแผน Sprint',
+    description: 'สกัด Title และ Effort (Story Points / Hours) จากการ์ด Figma และ FigJam ให้เป็น JSON และ Azure DevOps CSV สำหรับวางแผน Sprint',
     platform: 'shared',
     category: 'utilities',
     badge: 'Agile & Sprint',
@@ -212,7 +212,7 @@ export const TOOLS_REGISTRY: ToolItem[] = [
       'สกัด Title & Effort จากการ์ด Figma อัตโนมัติ',
       'แปลงเป็น JSON Array ตาม Schema ที่ต้องการ',
       'ส่งออก Azure DevOps CSV (Title, Effort, Activity)',
-      'รองรับ Jira CSV & Azure REST API Payload',
+      'รองรับ Azure REST API Batch Payload',
     ],
   },
 ];

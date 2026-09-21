@@ -22,7 +22,6 @@ import {
   parseFigmaCards,
   formatCardsToJson,
   formatCardsToAzureCsv,
-  formatCardsToJiraCsv,
   formatCardsToAzureApiJson,
   FigmaCardItem,
   FigmaParserOptions,
@@ -129,7 +128,7 @@ Background Job Queue
   },
 ];
 
-type OutputTab = 'json' | 'azure-csv' | 'jira-csv' | 'table' | 'azure-api';
+type OutputTab = 'json' | 'azure-csv' | 'table' | 'azure-api';
 
 export const FigmaToAzureTasksTool: React.FC = () => {
   const [selectedPresetId, setSelectedPresetId] = useState<string>(SAMPLE_PRESETS[0].id);
@@ -183,7 +182,6 @@ export const FigmaToAzureTasksTool: React.FC = () => {
   // Generated Output Strings
   const generatedJson = useMemo(() => formatCardsToJson(cards, options), [cards, options]);
   const generatedAzureCsv = useMemo(() => formatCardsToAzureCsv(cards, options), [cards, options]);
-  const generatedJiraCsv = useMemo(() => formatCardsToJiraCsv(cards, options), [cards, options]);
   const generatedAzureApi = useMemo(() => formatCardsToAzureApiJson(cards, options), [cards, options]);
 
   const currentOutputContent = useMemo(() => {
@@ -192,8 +190,6 @@ export const FigmaToAzureTasksTool: React.FC = () => {
         return generatedJson;
       case 'azure-csv':
         return generatedAzureCsv;
-      case 'jira-csv':
-        return generatedJiraCsv;
       case 'azure-api':
         return generatedAzureApi;
       case 'table':
@@ -201,7 +197,7 @@ export const FigmaToAzureTasksTool: React.FC = () => {
       default:
         return generatedJson;
     }
-  }, [activeTab, generatedJson, generatedAzureCsv, generatedJiraCsv, generatedAzureApi]);
+  }, [activeTab, generatedJson, generatedAzureCsv, generatedAzureApi]);
 
   const handleCopy = async () => {
     if (!currentOutputContent) return;
@@ -215,8 +211,8 @@ export const FigmaToAzureTasksTool: React.FC = () => {
     let mime = 'application/json';
     let content = currentOutputContent;
 
-    if (activeTab === 'azure-csv' || activeTab === 'jira-csv') {
-      filename = `${activeTab === 'azure-csv' ? 'azure-tasks' : 'jira-tasks'}.csv`;
+    if (activeTab === 'azure-csv') {
+      filename = 'azure-tasks.csv';
       mime = 'text/csv;charset=utf-8;';
     } else if (activeTab === 'azure-api') {
       filename = 'azure-devops-batch.json';
@@ -251,46 +247,45 @@ export const FigmaToAzureTasksTool: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-white dark:bg-slate-900/80 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-sm dark:shadow-xl transition-colors duration-200">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+      <div className="bg-white dark:bg-slate-900/80 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-4 shadow-sm dark:shadow-xl transition-colors duration-200">
+        <div className="space-y-1.5 flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0">
               <Kanban className="w-5 h-5" />
             </span>
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              Figma Cards to Azure &amp; JSON Tasks
+              <span>Figma Cards to Azure &amp; JSON Tasks</span>
               <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
                 Sprint Planning Ready
               </span>
             </h2>
           </div>
           <p className="text-xs text-slate-600 dark:text-slate-400">
-            แปลงข้อความที่ Copy มาจากการ์ด Figma/FigJam ให้กลายเป็น JSON และ Azure DevOps / Jira Tasks พร้อมสกัด Title และ Effort อัตโนมัติ
+            แปลงข้อความที่ Copy มาจากการ์ด Figma/FigJam ให้กลายเป็น JSON และ Azure DevOps Tasks พร้อมสกัด Title และ Effort อัตโนมัติ
           </p>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Action Controls Toolbar (Full-width responsive toolbar without broken wrapping) */}
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           {/* Custom Elegant Presets Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2.5 px-3 py-2 bg-slate-50 dark:bg-slate-950/90 hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700/80 hover:border-emerald-500/60 shadow-sm dark:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/30 group"
+              className="h-10 flex items-center gap-2.5 px-3 bg-slate-50 dark:bg-slate-950/90 hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700/80 hover:border-emerald-500/60 shadow-sm dark:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/30 group"
             >
-              <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${selectedPreset.iconBg}`}>
+              <div className={`w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${selectedPreset.iconBg}`}>
                 <SelectedIcon className="w-3.5 h-3.5" />
               </div>
-              <div className="text-left hidden sm:block">
-                <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold leading-none">
+              <div className="text-left">
+                <div className="text-[9px] uppercase tracking-wider text-slate-400 font-bold leading-none">
                   Preset
                 </div>
-                <div className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors truncate max-w-[150px]">
+                <div className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors whitespace-nowrap">
                   {selectedPreset.name}
                 </div>
               </div>
-              <span className="sm:hidden text-xs font-bold">{selectedPreset.name}</span>
               <ChevronDown
-                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ml-0.5 shrink-0 ${
                   isDropdownOpen ? 'rotate-180 text-emerald-500 dark:text-emerald-400' : 'group-hover:text-slate-600 dark:group-hover:text-slate-200'
                 }`}
               />
@@ -355,7 +350,7 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
           <button
             onClick={() => setShowOptions(!showOptions)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${
+            className={`h-10 flex items-center gap-1.5 px-3.5 rounded-xl text-xs font-semibold border transition-all ${
               showOptions
                 ? 'bg-emerald-600 text-white border-emerald-500 shadow-md'
                 : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700'
@@ -367,7 +362,7 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition-all active:scale-95"
+            className="h-10 flex items-center gap-1.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition-all active:scale-95 whitespace-nowrap"
           >
             {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? 'Copied!' : 'Copy Output'}</span>
@@ -375,8 +370,8 @@ export const FigmaToAzureTasksTool: React.FC = () => {
 
           <button
             onClick={handleDownload}
-            className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-300 dark:border-slate-700 transition-colors"
-            title="Download Output"
+            className="h-10 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-300 dark:border-slate-700 transition-colors flex items-center justify-center"
+            title="Download Output File"
           >
             <Download className="w-4 h-4" />
           </button>
@@ -391,7 +386,7 @@ export const FigmaToAzureTasksTool: React.FC = () => {
               <SlidersHorizontal className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
               Task Extraction &amp; Field Customization
             </h3>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">ปรับแต่ง Schema ให้ตรงกับ Azure DevOps / Jira</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">ปรับแต่ง Schema ให้ตรงกับ Azure DevOps</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
@@ -611,18 +606,6 @@ VAT & Shipping Fee
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
                 <span>Azure DevOps CSV</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('jira-csv')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  activeTab === 'jira-csv'
-                    ? 'bg-amber-600 text-white shadow-md'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-slate-800'
-                }`}
-              >
-                <FileSpreadsheet className="w-3.5 h-3.5" />
-                <span>Jira CSV</span>
               </button>
 
               <button
